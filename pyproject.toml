@@ -1,0 +1,14 @@
+[project]
+name = "hdb-rentals"
+version = "0.1.0"
+description = "EDA and rent prediction on Singapore HDB rental approvals"
+requires-python = ">=3.11"
+dependencies = [
+    "ipykernel>=6.30",
+    "matplotlib>=3.10",
+    "pandas>=2.2",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.15",
+    "seaborn>=0.13",
+    "statsmodels>=0.15.0",
+]
