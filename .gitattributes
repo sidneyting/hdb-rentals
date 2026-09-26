@@ -1,0 +1,3 @@
+# Experiment runs are appended, never edited. A union merge keeps every
+# teammate's lines instead of raising a conflict on each merge.
+experiments.jsonl merge=union
