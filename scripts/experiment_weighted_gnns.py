@@ -7,14 +7,13 @@ Set HDB_WEIGHTED_GNN_SMOKE=1 for a separate short execution check.
 import torch
 from torch import nn
 from pathlib import Path
-import os,time,json,gc,random
+import os,json,gc
 import numpy as np
 import pandas as pd
-from scipy.sparse import coo_matrix
-from sklearn.neighbors import BallTree
 from investigate_graph_signal import ROOT,blocks,rent,edges,N,BLOCK_NUM,BLOCK_CAT,preprocessor,metrics
 from hdb_rentals.rent_adjustment import MarketRentAdjustment
 from hdb_rentals.block_evaluation import block_time_partitions
+from hdb_rentals import gnn
 
 SMOKE=os.environ.get('HDB_WEIGHTED_GNN_SMOKE','0')=='1'
 OUT=Path(os.environ['HDB_WEIGHTED_GNN_OUTPUT']) if 'HDB_WEIGHTED_GNN_OUTPUT' in os.environ else ROOT/'outputs'/('12_weighted_gnns_smoke' if SMOKE else '12_weighted_gnns')
@@ -31,40 +30,11 @@ HIDDEN=64
 DEVICE=torch.device('cpu')
 torch.set_num_threads(int(os.environ.get('HDB_WEIGHTED_GNN_THREADS','4')))
 
-# Symmetric geographic edges with distances from the original 1 km/8-NN graph.
-u=edges.source.to_numpy(int);v=edges.target.to_numpy(int)
-row=np.r_[u,v];col=np.r_[v,u]
-distance=np.tile(edges.distance_km.to_numpy(float),2)
-year=blocks.YEAR_COMPLETED.fillna(blocks.YEAR_COMPLETED.median()).to_numpy()
-floor=blocks.MAX_FLOOR.fillna(blocks.MAX_FLOOR.median()).to_numpy()
-edge_x=np.column_stack([distance,abs(year[row]-year[col])/20.,abs(floor[row]-floor[col])/10.,
-    (blocks.SUBZONE.iloc[row].to_numpy()==blocks.SUBZONE.iloc[col].to_numpy()).astype(float),
-    (blocks.TOWN.iloc[row].to_numpy()==blocks.TOWN.iloc[col].to_numpy()).astype(float),
-    abs(blocks.mrt_nearest_km.to_numpy()[row]-blocks.mrt_nearest_km.to_numpy()[col])]).astype('float32')
-EDGE_INDEX=torch.tensor(np.stack([row,col]),dtype=torch.long)
-EDGE_FEATURES=torch.tensor(edge_x)
-
-# A separate neighborhood band tests whether the original graph is too local.
-coords=np.radians(blocks[['LATITUDE','LONGITUDE']].to_numpy())
-tree=BallTree(coords,metric='haversine')
-far_ids,far_dist=tree.query_radius(coords,r=1.5/6371.0088,return_distance=True,sort_results=True)
-far_rows=[];far_cols=[];far_weights=[]
-for i,(ids,dists) in enumerate(zip(far_ids,far_dist)):
-    km=dists*6371.0088
-    valid=(km>=.25)&(km<=1.5)
-    ids,km=ids[valid][:8],km[valid][:8]
-    far_rows.extend([i]*len(ids));far_cols.extend(ids);far_weights.extend(np.exp(-km/.75))
-far_sparse=coo_matrix((far_weights,(far_rows,far_cols)),shape=(N,N)).tocsr()
-far_sparse=far_sparse.maximum(far_sparse.T).tocoo()
-FAR_INDEX=torch.tensor(np.stack([far_sparse.row,far_sparse.col]),dtype=torch.long)
-fw=torch.tensor(far_sparse.data,dtype=torch.float32)
-fd=torch.zeros(N).scatter_add_(0,FAR_INDEX[0],fw)
-FAR_ADJACENCY=torch.sparse_coo_tensor(FAR_INDEX,fw/fd[FAR_INDEX[0]].clamp_min(1e-10),(N,N),check_invariants=True).coalesce()
-FAR_PRESENT=fd.gt(0).float().unsqueeze(1)
-
-
-def seed_everything(seed):
-    random.seed(seed);np.random.seed(seed);torch.manual_seed(seed)
+# Graph tensors and the model live in hdb_rentals.gnn; these names stay for other scripts.
+GRAPH=gnn.build_graph(blocks,edges)
+EDGE_INDEX=GRAPH.edge_index;EDGE_FEATURES=GRAPH.edge_features
+FAR_ADJACENCY=GRAPH.far_adjacency;FAR_PRESENT=GRAPH.far_present
+WeightedRentalGNN=gnn.WeightedRentalGNN;predict=gnn.predict;seed_everything=gnn.seed_everything
 
 
 def prepare(fit,*others):
@@ -87,92 +57,10 @@ def prepare(fit,*others):
     return dict(nodes=node_x,parts=[pack(f) for f in (fit,*others)],mean=mean,std=std)
 
 
-class WeightedRentalGNN(nn.Module):
-    def __init__(self,kind,node_dim,record_dim):
-        super().__init__();self.kind=kind
-        self.projection=nn.Linear(node_dim,HIDDEN)
-        self.roots=nn.ModuleList([nn.Linear(HIDDEN,HIDDEN) for _ in range(2)])
-        self.messages=nn.ModuleList([nn.Linear(HIDDEN,HIDDEN,bias=False) for _ in range(2)])
-        self.gates=nn.ModuleList([nn.Linear(2*HIDDEN,HIDDEN) for _ in range(2)])
-        for gate in self.gates:nn.init.constant_(gate.bias,-2.)
-        self.drop=nn.Dropout(.2)
-        self.head=nn.Sequential(nn.Linear(HIDDEN+record_dim,HIDDEN),nn.ReLU(),nn.Dropout(.2),nn.Linear(HIDDEN,1))
-        if kind=='GNN_learned_edges':
-            self.edge_network=nn.Sequential(nn.Linear(6,16),nn.ReLU(),nn.Linear(16,1))
-            nn.init.zeros_(self.edge_network[-1].weight);nn.init.zeros_(self.edge_network[-1].bias)
-            self.log_tau=nn.Parameter(torch.tensor(float(np.log(np.expm1(.3)))))
-        if kind=='GNN_multiscale':
-            self.scale_logits=nn.Parameter(torch.zeros(2))
-            self.register_buffer('far_adjacency',FAR_ADJACENCY)
-            self.register_buffer('far_present',FAR_PRESENT)
-        self.register_buffer('edge_index',EDGE_INDEX)
-        self.register_buffer('edge_features',EDGE_FEATURES)
-        fixed=torch.ones(len(row))
-        if kind=='GNN_distance':fixed=torch.exp(-self.edge_features[:,0]/.3)
-        if kind=='GNN_similarity':
-            fixed=torch.exp(-self.edge_features[:,0]/.3-self.edge_features[:,1]*(20/15)-self.edge_features[:,2]*(10/8))
-        self.register_buffer('fixed_weights',fixed)
-        if kind not in ['MLP_matched','GNN_learned_edges']:
-            self.register_buffer('fixed_adjacency',self.normalize(fixed))
-
-    def normalize(self,w):
-        degree=torch.zeros(N,dtype=w.dtype).scatter_add_(0,self.edge_index[0],w)
-        w=w/degree[self.edge_index[0]].clamp_min(1e-10)
-        return torch.sparse_coo_tensor(self.edge_index,w,(N,N),check_invariants=True).coalesce()
-
-    def adjacency(self):
-        if self.kind=='MLP_matched':return None
-        if self.kind=='GNN_learned_edges':
-            tau=torch.nn.functional.softplus(self.log_tau).clamp(.03,3.)
-            w=torch.exp(-self.edge_features[:,0]/tau)*torch.sigmoid(self.edge_network(self.edge_features).squeeze(-1))
-            return self.normalize(w)
-        return self.fixed_adjacency
-
-    def forward(self,nodes,part):
-        z=self.drop(torch.relu(self.projection(nodes)))
-        adjacency=self.adjacency()
-        for layer,(root,message,gate) in enumerate(zip(self.roots,self.messages,self.gates)):
-            # Identity adjacency in MLP keeps the same active layers and gates.
-            aggregated=z if adjacency is None else torch.sparse.mm(adjacency,z)
-            if self.kind=='GNN_multiscale':
-                amount=torch.sigmoid(self.scale_logits[layer])*self.far_present
-                aggregated=(1-amount)*aggregated+amount*torch.sparse.mm(self.far_adjacency,z)
-            incoming=message(aggregated)
-            amount=torch.sigmoid(gate(torch.cat([z,incoming],dim=1)))
-            z=self.drop(torch.relu(root(z)+amount*incoming))
-        return self.head(torch.cat([z[part['ids']],part['record']],dim=1)).squeeze(-1)
-
-
-@torch.no_grad()
-def predict(model,bundle,part):
-    model.eval()
-    adjusted=model(bundle['nodes'],part).numpy()*bundle['std']+bundle['mean']
-    return np.maximum(adjusted,0)*part['scale']
-
-
-def train(kind,bundle,seed,epochs,tune=False):
-    seed_everything(seed)
-    model=WeightedRentalGNN(kind,bundle['nodes'].shape[1],bundle['parts'][0]['record'].shape[1])
-    optimizer=torch.optim.AdamW(model.parameters(),lr=.001,weight_decay=.0001)
-    fit=bundle['parts'][0];best=float('inf');best_epoch=epochs;stale=0;history=[]
-    start=time.monotonic()
-    for epoch in range(1,epochs+1):
-        model.train();optimizer.zero_grad(set_to_none=True)
-        err=model(bundle['nodes'],fit)-fit['scaled_y']
-        loss=(fit['weight']*err.square()).mean()
-        assert torch.isfinite(loss)
-        loss.backward();nn.utils.clip_grad_norm_(model.parameters(),5.);optimizer.step()
-        record=dict(epoch=epoch,train_objective=float(loss.detach()))
-        if tune:
-            score=metrics(bundle['parts'][1]['y'],predict(model,bundle,bundle['parts'][1]))['rmse']
-            record['inner_rmse']=score
-            if score<best-.01:best=score;best_epoch=epoch;stale=0
-            else:stale+=1
-        history.append(record)
-        if epoch==1 or epoch%40==0:
-            print(kind,seed,'tune' if tune else 'refit',epoch,'loss',round(record['train_objective'],4),
-                  'seconds',round(time.monotonic()-start,1),flush=True)
-        if tune and stale>=PATIENCE:break
+def train(kind,bundle,seed,epochs,tune=False,save_to=None,**metadata):
+    model,best_epoch,history=gnn.train(kind,bundle,GRAPH,seed,epochs,tune=tune,patience=PATIENCE,hidden=HIDDEN)
+    if save_to is not None:
+        gnn.save_model(model,save_to,kind=kind,seed=seed,epochs=epochs,best_epoch=best_epoch,**metadata)
     return model,best_epoch,history
 
 
@@ -222,7 +110,8 @@ def main():
                 tags=dict(experiment=experiment,origin=origin,split_seed=split_seed,model=kind,seed=seed)
                 tuned,count,history=train(kind,inner,seed,MAX_EPOCHS,tune=True)
                 histories.extend([{**tags,**h} for h in history]);del tuned;gc.collect()
-                fitted,_,_=train(kind,outer,seed,count)
+                fitted,_,_=train(kind,outer,seed,count,save_to=OUT/'models'/f'{experiment}_{kind}_seed{seed}.pt',
+                                 experiment=experiment,origin=origin,split_seed=split_seed)
                 pred=predict(fitted,outer,outer['parts'][1])
                 frame=val[['row_id','block_id','RENT_APPROVAL_DATE','MONTHLY_RENT','block_slice']].copy()
                 frame['prediction']=pred
