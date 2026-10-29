@@ -1,0 +1,14 @@
+{
+  "smoke": false,
+  "premiums": "none,row,row+node",
+  "models": "MLP_matched,GNN_uniform",
+  "seed": 0,
+  "max_epochs": 320,
+  "threads": 4,
+  "patience": 30,
+  "level": "damped",
+  "smoothing": [
+    20,
+    5
+  ]
+}
