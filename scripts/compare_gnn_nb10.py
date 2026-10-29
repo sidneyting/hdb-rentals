@@ -141,13 +141,14 @@ def nb10_e0(hdb):
 # ---------------------------------------------------------------- GNN side
 
 
-def prepare(fit, others, level, block_num):
-    # experiment_weighted_gnns.prepare with the level method and block columns as arguments.
+def prepare(fit, others, level, block_num, record_extra=()):
+    # experiment_weighted_gnns.prepare with the level method, block columns and extra row
+    # columns as arguments.
     adjustment = MarketRentAdjustment(level).fit(fit)
     bp = ewg.preprocessor(block_num, ewg.BLOCK_CAT + ["SUBZONE"])
     bp.fit(ewg.blocks.iloc[np.sort(fit.block_id.unique())])
     node_x = torch.tensor(bp.transform(ewg.blocks).astype("float32"))
-    rp = ewg.preprocessor(["FLOOR_AREA_SQM", "FLAT_AGE"], ["FLAT_TYPE", "FLAT_MODEL"])
+    rp = ewg.preprocessor(["FLOOR_AREA_SQM", "FLAT_AGE", *record_extra], ["FLAT_TYPE", "FLAT_MODEL"])
     rp.fit(fit)
     fit_scale = adjustment.multipliers(fit.MONTH_INDEX)
     adjusted = fit.MONTHLY_RENT.to_numpy() / fit_scale
