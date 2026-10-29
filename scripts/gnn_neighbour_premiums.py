@@ -46,7 +46,7 @@ class NeighbourPremiumGNN(ewg.WeightedRentalGNN):
     """WeightedRentalGNN plus a one-hop channel carrying neighbours' (never own) premiums."""
 
     def __init__(self, kind, node_dim, record_dim, premiums):
-        super().__init__(kind, node_dim, record_dim)
+        super().__init__(kind, node_dim, record_dim, ewg.GRAPH, hidden=ewg.HIDDEN)
         hidden = ewg.HIDDEN
         self.register_buffer("premiums", premiums)
         # Uniform mean over neighbours; edge_index holds both directions and no self-loops.
@@ -56,16 +56,18 @@ class NeighbourPremiumGNN(ewg.WeightedRentalGNN):
         self.premium_gate = nn.Linear(2 * hidden, hidden)
         nn.init.constant_(self.premium_gate.bias, -2.)
 
-    def forward(self, nodes, part):
+    def forward(self, nodes, part, edge_mask=None):
         # WeightedRentalGNN.forward (uniform / MLP kinds), then the premium channel, then the head.
+        # edge_mask multiplies each directed edge in message passing and in the premium channel.
         z = self.drop(torch.relu(self.projection(nodes)))
-        adjacency = self.adjacency()
+        adjacency = self.adjacency(edge_mask)
         for root, message, gate in zip(self.roots, self.messages, self.gates):
             aggregated = z if adjacency is None else torch.sparse.mm(adjacency, z)
             incoming = message(aggregated)
             amount = torch.sigmoid(gate(torch.cat([z, incoming], dim=1)))
             z = self.drop(torch.relu(root(z) + amount * incoming))
-        h = self.premium_message(torch.sparse.mm(self.neighbour_adjacency, self.premium_in(self.premiums)))
+        neighbours = self.neighbour_adjacency if edge_mask is None else self.normalize(edge_mask)
+        h = self.premium_message(torch.sparse.mm(neighbours, self.premium_in(self.premiums)))
         amount = torch.sigmoid(self.premium_gate(torch.cat([z, h], dim=1)))
         self.last_premium_gate = amount.detach()
         z = z + amount * h
