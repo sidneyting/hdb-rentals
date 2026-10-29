@@ -1,0 +1,10 @@
+model,level,features,tuning,holdout,holdout vs E0
+nb10_E0_LightGBM,MONTH_INDEX,nb10,603.6,487.49,0.0
+MLP_matched,damped,gnn,595.46,488.81,1.32
+GNN_uniform,damped,gnn,595.34,489.81,2.31
+MLP_matched,damped,nb10,595.09,489.28,1.79
+GNN_uniform,damped,nb10,595.28,489.71,2.21
+MLP_matched,blend,gnn,598.57,489.35,1.85
+GNN_uniform,blend,gnn,598.77,491.11,3.62
+MLP_matched,blend,nb10,598.32,489.35,1.86
+GNN_uniform,blend,nb10,598.62,490.35,2.86
