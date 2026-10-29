@@ -1,0 +1,27 @@
+{
+  "smoke": false,
+  "levels": "damped,blend",
+  "features": "gnn,nb10",
+  "models": "MLP_matched,GNN_uniform",
+  "seed": 0,
+  "max_epochs": 320,
+  "threads": 4,
+  "patience": 30,
+  "hidden": 64,
+  "tuning": [
+    "2023-04-01",
+    "2024-01-01"
+  ],
+  "holdout": [
+    "2024-01-01",
+    "2025-04-01"
+  ],
+  "nb10_extra": [
+    "hawker_nearest_km",
+    "hawker_within_1km",
+    "dist_to_cbd_km",
+    "mrt_interchange_nearest_km",
+    "mrt_interchange_within_1km"
+  ],
+  "torch_version": "2.15.0+cpu"
+}

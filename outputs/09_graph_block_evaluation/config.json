@@ -1,0 +1,126 @@
+{
+  "smoke": false,
+  "model_seeds": [
+    0,
+    1,
+    2
+  ],
+  "block_split_seeds": [
+    17,
+    29,
+    43
+  ],
+  "holdout_fraction": 0.2,
+  "arms": [
+    "MLP_geo",
+    "BlockSAGE_geo",
+    "MRT_school_SAGE",
+    "AllAmenities_no_rail",
+    "LightGBM_geo"
+  ],
+  "tune_cut": "2023-07-01 00:00:00",
+  "outer_cut": "2024-01-01 00:00:00",
+  "candidate_policy": "blocks observed before tune_cut; uniform random block sampling",
+  "tuning_policy": "retained blocks only; held-out rents excluded at every date",
+  "graph_policy": "all fixed unlabeled auxiliary nodes and edges remain visible",
+  "market_method": "damped",
+  "loss_space": "sgd",
+  "max_epochs": 360,
+  "patience": 15,
+  "hidden": 64,
+  "dropout": 0.2,
+  "learning_rate": 0.001,
+  "k": 8,
+  "block_radius_km": 1.0,
+  "amenity_radii_km": {
+    "mrt": 1.0,
+    "school": 1.0,
+    "mall": 2.0
+  },
+  "mrt_policy": "operating_by_2021_01",
+  "block_numeric_features": [
+    "LATITUDE",
+    "LONGITUDE",
+    "MAX_FLOOR",
+    "YEAR_COMPLETED",
+    "mrt_nearest_km",
+    "mrt_within_500m",
+    "mrt_within_1km",
+    "mrt_within_2km",
+    "school_nearest_km",
+    "school_within_500m",
+    "school_within_1km",
+    "school_within_2km",
+    "mall_nearest_km",
+    "mall_within_500m",
+    "mall_within_1km",
+    "mall_within_2km",
+    "primary_nearest_km",
+    "primary_within_500m",
+    "primary_within_1km",
+    "primary_within_2km",
+    "secondary_nearest_km",
+    "secondary_within_500m",
+    "secondary_within_1km",
+    "secondary_within_2km",
+    "school_level_count_centralised_institute",
+    "school_level_count_junior_college",
+    "school_level_count_mixed_level_p1_s4",
+    "school_level_count_mixed_level_s1_jc2",
+    "school_level_count_mixed_level_s1_s5_jc1_jc2",
+    "school_level_count_primary",
+    "school_level_count_secondary_s1_s4",
+    "school_level_count_secondary_s1_s5",
+    "mrt_count_line_ns",
+    "mrt_count_line_ew",
+    "mrt_count_line_ne",
+    "mrt_count_line_cc",
+    "mrt_count_line_dt",
+    "mrt_count_line_te",
+    "mrt_count_is_interchange"
+  ],
+  "block_categorical_features": [
+    "TOWN",
+    "PLANNING_AREA"
+  ],
+  "record_features": [
+    "FLOOR_AREA_SQM",
+    "FLAT_AGE",
+    "FLAT_TYPE",
+    "FLAT_MODEL"
+  ],
+  "model_specs": {
+    "MLP_geo": {
+      "amenities": [],
+      "graph": false,
+      "rail": false
+    },
+    "BlockSAGE_geo": {
+      "amenities": [],
+      "graph": true,
+      "rail": false
+    },
+    "MRT_school_SAGE": {
+      "amenities": [
+        "mrt",
+        "school"
+      ],
+      "graph": true,
+      "rail": true
+    },
+    "AllAmenities_no_rail": {
+      "amenities": [
+        "mrt",
+        "school",
+        "mall"
+      ],
+      "graph": true,
+      "rail": false
+    }
+  },
+  "versions": {
+    "python": "3.12.16 | packaged by Anaconda, Inc. | (main, Oct 26 2026, 20:15:26) [Clang 20.1.8 ]",
+    "torch": "2.14.1",
+    "pandas": "3.1.0"
+  }
+}

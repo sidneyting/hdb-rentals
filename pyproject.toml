@@ -14,6 +14,7 @@ dependencies = [
     "lightgbm>=4.6",
     "xgboost>=3.2.0",
     "catboost>=1.2.10",
+    "torch>=2.15.0",
 ]
 
 # Installs src/hdb_rentals in editable mode on `uv sync`, so notebooks can
