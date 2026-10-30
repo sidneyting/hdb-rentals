@@ -2,8 +2,13 @@
 
     uv run python scripts/gnn_premiums_blend.py            # full run
     uv run python scripts/gnn_premiums_blend.py --smoke    # 3 epochs, a quick execution check
+    uv run python scripts/gnn_premiums_blend.py --level blend --same-level   # both models on one level
 
 Same windows, rows, level (damped) and block columns (the GNN's own) as compare_gnn_nb10.py.
+--level sets the neural model's market level (damped or blend). By default LightGBM keeps
+`MONTH_INDEX`, as in notebook 10's E0/E1; --same-level makes it learn rent / the same level instead
+(notebook 10's E6 setup: `MONTH_INDEX` dropped, rows weighted by level squared), so the two models
+differ only in the premium model. Non-default runs write to a subfolder named after the options.
 
 Premium inputs (notebook 10 E1: block and block + flat type premiums of relative rent, smoothing
 20 / 5, plus the block + flat type row count; built from each split's fit rows only):
@@ -90,9 +95,13 @@ def nb10_premium_frames(hdb):
     return tr, frames
 
 
-def nb10_lgbm(tr, frames):
-    """E0 and E1 (E0 + `oof` premiums) LightGBM, predictions keyed by row_id."""
-    num, cat = ["FLOOR_AREA_SQM", "LEASE_COMMENCE_DATE", "MONTH_INDEX"] + cmp.DIST, ["TOWN", "FLAT_TYPE", "FLAT_MODEL"]
+def nb10_lgbm(tr, frames, level=None):
+    """E0 and E1 (E0 + `oof` premiums) LightGBM, predictions keyed by row_id.
+
+    level=None keeps `MONTH_INDEX` (notebook 10's E0/E1). A level method instead fits rent / level
+    without `MONTH_INDEX`, weighted by level squared (notebook 10's E6)."""
+    time_col = [] if level else ["MONTH_INDEX"]
+    num, cat = ["FLOOR_AREA_SQM", "LEASE_COMMENCE_DATE"] + time_col + cmp.DIST, ["TOWN", "FLAT_TYPE", "FLAT_MODEL"]
     categories = {c: pd.CategoricalDtype(sorted(tr[c].unique())) for c in cat}
 
     def matrix(df, extra):
@@ -105,7 +114,14 @@ def nb10_lgbm(tr, frames):
     for name, extra in [("nb10_E0_LightGBM", []), ("nb10_E1_LightGBM", PREM)]:
         for split, (fit_df, val_df, _) in frames.items():
             est = lgb.LGBMRegressor(**cmp.LGBM_TUNED, verbose=-1, n_jobs=-1, random_state=0)
-            p = est.fit(matrix(fit_df, extra), fit_df[TARGET].to_numpy()).predict(matrix(val_df, extra))
+            if level:
+                # Fitted on the GNN's rent frame (same rows, has FLAT_AGE), as cmp.prepare does.
+                adj = cmp.MarketRentAdjustment(level).fit(ewg.rent[ewg.rent.row_id.isin(fit_df.row_id)])
+                fs, vs = adj.multipliers(fit_df["MONTH_INDEX"]), adj.multipliers(val_df["MONTH_INDEX"])
+                est.fit(matrix(fit_df, extra), fit_df[TARGET].to_numpy() / fs, sample_weight=fs ** 2)
+                p = est.predict(matrix(val_df, extra)) * vs
+            else:
+                p = est.fit(matrix(fit_df, extra), fit_df[TARGET].to_numpy()).predict(matrix(val_df, extra))
             preds[(name, split)] = pd.Series(p, index=val_df["row_id"].to_numpy())
             rows.append(dict(split=split, model=name, premiums="row" if extra else "none",
                              n_rows=len(val_df), **ewg.metrics(val_df[TARGET], p)))
@@ -135,16 +151,20 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--max-epochs", type=int, default=320)
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--level", default="damped", choices=["damped", "blend"])
+    ap.add_argument("--same-level", action="store_true", help="LightGBM uses the neural model's level")
     args = ap.parse_args()
     max_epochs = 3 if args.smoke else args.max_epochs
     ewg.PATIENCE = 2 if args.smoke else 30
     torch.set_num_threads(args.threads)
     out = OUT / "smoke" if args.smoke else OUT
+    if args.level != "damped" or args.same_level or args.seed != 0:
+        out = out / f"level-{args.level}{'_same' if args.same_level else ''}_seed{args.seed}"
     out.mkdir(parents=True, exist_ok=True)
 
     hdb = cmp.nb10_block_table()
     tr, frames = nb10_premium_frames(hdb)
-    gb_preds, results = nb10_lgbm(tr, frames)
+    gb_preds, results = nb10_lgbm(tr, frames, args.level if args.same_level else None)
     for r in results:
         print("REFERENCE", r, flush=True)
 
@@ -165,7 +185,7 @@ def main():
           f"{blocks[KEY].merge(frames['holdout'][2], on=KEY, how='left')['NODE_LOG_N'].isna().sum()}", flush=True)
 
     (out / "config.json").write_text(json.dumps(dict(vars(args), max_epochs=max_epochs, patience=ewg.PATIENCE,
-                                                     level="damped", smoothing=[M_BLOCK, M_FT]), indent=2))
+                                                     level=args.level, smoothing=[M_BLOCK, M_FT]), indent=2))
     predictions = []
     for prem in args.premiums.split(","):
         record_extra = [] if prem == "none" else PREM
@@ -174,7 +194,7 @@ def main():
         for s, (f, v) in parts.items():
             if prem == "row+node":
                 blocks[NODE_PREM] = node_prem[s]  # read by prepare when it builds node features
-            bundles[s] = cmp.prepare(f, [v], "damped", block_num, record_extra)
+            bundles[s] = cmp.prepare(f, [v], args.level, block_num, record_extra)
         partner = "nb10_E0_LightGBM" if prem == "none" else "nb10_E1_LightGBM"
         for kind in args.models.split(","):
             tags = dict(model=kind, premiums=prem, seed=args.seed)
