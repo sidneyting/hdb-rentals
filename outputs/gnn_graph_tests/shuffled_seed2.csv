@@ -1,0 +1,2 @@
+seed,model,premiums,graph,epochs,rmse,mae,bias
+2,GNN_uniform,row,shuffled,222,482.1833727208243,356.3396892245206,-9.145906816465802

@@ -5,8 +5,9 @@
   "seed": 0,
   "max_epochs": 320,
   "threads": 4,
-  "patience": 30,
   "level": "damped",
+  "same_level": false,
+  "patience": 30,
   "smoothing": [
     20,
     5

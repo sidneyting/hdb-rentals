@@ -1,0 +1,3 @@
+graph,rmse,sd,bias
+real,482.03,0.29,-8.75
+shuffled,482.01,0.39,-8.03

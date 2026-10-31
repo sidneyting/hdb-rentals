@@ -3,7 +3,7 @@
     uv run python scripts/gnn_neighbour_premiums.py            # full run
     uv run python scripts/gnn_neighbour_premiums.py --smoke    # 3 epochs, a quick execution check
 
-Same windows, rows, level (damped), block columns and row premiums (`row`, notebook 10 E1) as
+Same windows, rows, level (damped), block columns and row premiums (`row`, Part 2.3 E1) as
 gnn_premiums_blend.py. New here:
 
 Neighbour premium channel (`row+nbr`). gnn_premiums_blend.py's `row+node` put each block's premium,
@@ -134,9 +134,9 @@ def main():
     out = OUT / "smoke" if args.smoke else OUT
     out.mkdir(parents=True, exist_ok=True)
 
-    hdb = cmp.nb10_block_table()
-    tr, frames = gpb.nb10_premium_frames(hdb)
-    gb_preds, results = gpb.nb10_lgbm(tr, frames)
+    hdb = cmp.part23_block_table()
+    tr, frames = gpb.part23_premium_frames(hdb)
+    gb_preds, results = gpb.part23_lgbm(tr, frames)
     for r in results:
         print("REFERENCE", r, flush=True)
 
@@ -166,7 +166,7 @@ def main():
         bundles[s]["node_premiums"] = node_premiums[s]
 
     y = {s: parts[s][1].set_index("row_id")[TARGET] for s in gpb.SPLITS}
-    gb = {s: gb_preds[("nb10_E1_LightGBM", s)].reindex(y[s].index) for s in gpb.SPLITS}
+    gb = {s: gb_preds[("part23_E1_LightGBM", s)].reindex(y[s].index) for s in gpb.SPLITS}
     hold = pd.DataFrame({TARGET: y["holdout"], "history": history["holdout"].reindex(y["holdout"].index),
                          "E1 LightGBM": gb["holdout"]})
     gates = []
@@ -212,7 +212,7 @@ def main():
         .reindex(pd.MultiIndex.from_frame(arms))[["tuning", "holdout"]]
     summary["weight"] = r[r.split == "holdout"].set_index(["model", "premiums"]).get("weight")
     summary.round(2).to_csv(out / "summary.csv")
-    print("\nRMSE (SGD), notebook 10 windows\n", summary.round(2).to_string(), flush=True)
+    print("\nRMSE (SGD), Part 2.3 windows\n", summary.round(2).to_string(), flush=True)
     table = breakdown.pivot(index="model", columns="history", values="rmse").reindex(cols)[BUCKETS[1] + ["all"]]
     sizes = breakdown.drop_duplicates("history").set_index("history")["n_rows"].reindex(BUCKETS[1] + ["all"])
     print("\nHoldout RMSE by fit rows in the same block + flat type\n", table.round(1).to_string(),

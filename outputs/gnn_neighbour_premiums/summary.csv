@@ -1,7 +1,7 @@
 model,premiums,tuning,holdout,weight
-nb10_E0_LightGBM,none,603.6,487.49,
-nb10_E1_LightGBM,row,599.79,483.14,
-MLP_matched,row+nbr,590.4,482.11,
-MLP_matched + E1 blend,row+nbr,589.68,480.6,0.8
-GNN_uniform,row+nbr,590.28,482.08,
-GNN_uniform + E1 blend,row+nbr,589.52,480.61,0.8
+part23_E0_LightGBM,none,603.6,487.49,
+part23_E1_LightGBM,row,599.79,483.14,
+MLP_matched,row+nbr,590.36,482.09,
+MLP_matched + E1 blend,row+nbr,589.65,480.59,0.8
+GNN_uniform,row+nbr,590.25,482.06,
+GNN_uniform + E1 blend,row+nbr,589.5,480.6,0.8

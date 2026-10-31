@@ -1,7 +1,7 @@
 {
   "smoke": false,
   "levels": "damped,blend",
-  "features": "gnn,nb10",
+  "features": "gnn,part23",
   "models": "MLP_matched,GNN_uniform",
   "seed": 0,
   "max_epochs": 320,
@@ -16,7 +16,7 @@
     "2024-01-01",
     "2025-04-01"
   ],
-  "nb10_extra": [
+  "part23_extra": [
     "hawker_nearest_km",
     "hawker_within_1km",
     "dist_to_cbd_km",

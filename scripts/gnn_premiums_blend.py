@@ -1,20 +1,20 @@
-"""GNN with notebook 10's block premiums, and GNN + LightGBM blends, on notebook 10's windows.
+"""GNN with Part 2.3's block premiums, and GNN + LightGBM blends, on Part 2.3's windows.
 
     uv run python scripts/gnn_premiums_blend.py            # full run
     uv run python scripts/gnn_premiums_blend.py --smoke    # 3 epochs, a quick execution check
     uv run python scripts/gnn_premiums_blend.py --level blend --same-level   # both models on one level
 
-Same windows, rows, level (damped) and block columns (the GNN's own) as compare_gnn_nb10.py.
+Same windows, rows, level (damped) and block columns (the GNN's own) as compare_gnn_lightgbm.py.
 --level sets the neural model's market level (damped or blend). By default LightGBM keeps
-`MONTH_INDEX`, as in notebook 10's E0/E1; --same-level makes it learn rent / the same level instead
-(notebook 10's E6 setup: `MONTH_INDEX` dropped, rows weighted by level squared), so the two models
+`MONTH_INDEX`, as in Part 2.3's E0/E1; --same-level makes it learn rent / the same level instead
+(Part 2.3's E6 setup: `MONTH_INDEX` dropped, rows weighted by level squared), so the two models
 differ only in the premium model. Non-default runs write to a subfolder named after the options.
 
-Premium inputs (notebook 10 E1: block and block + flat type premiums of relative rent, smoothing
+Premium inputs (Part 2.3 E1: block and block + flat type premiums of relative rent, smoothing
 20 / 5, plus the block + flat type row count; built from each split's fit rows only):
-    none      no premiums (compare_gnn_nb10.py's arm, re-run for its tuning predictions)
+    none      no premiums (compare_gnn_lightgbm.py's arm, re-run for its tuning predictions)
     row       each row gets E1's premiums: out-of-fold for fit rows, all fit rows for scored rows,
-              exactly the columns notebook 10's LightGBM gets
+              exactly the columns Part 2.3's LightGBM gets
     row+node  as row, and each block node also carries its block premium and log row count, so
               the graph can pass premiums between neighbouring blocks. Node premiums use all fit
               rows (a fit row's own rent is in its block's node), so this arm may overfit; scored
@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "src"), str(ROOT / "scripts")]
 
-import compare_gnn_nb10 as cmp  # noqa: E402  (imports torch before LightGBM)
+import compare_gnn_lightgbm as cmp  # noqa: E402  (imports torch before LightGBM)
 import lightgbm as lgb  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
@@ -49,10 +49,10 @@ NODE_PREM = ["NODE_BLOCK_PREM", "NODE_LOG_N"]
 M_BLOCK, M_FT = 20, 5
 SPLITS = {"tuning": (cmp.TUNE_START, cmp.HOLD_START), "holdout": (cmp.HOLD_START, cmp.HOLD_END)}
 
-# ---------------------------------------------------------------- notebook 10, cells [4] and [12]
+# ---------------------------------------------------------------- Part 2.3
 
 
-def nb10_premium_frames(hdb):
+def part23_premium_frames(hdb):
     """Notebook 10's frames per split with E1 `oof` premiums, plus block-level fit premiums."""
     raw = cmp.clean_rent(pd.read_csv(cmp.DATA / "train.csv"))
     raw["row_id"] = np.arange(len(raw))  # train.csv order, as the GNN's rent frame
@@ -95,11 +95,11 @@ def nb10_premium_frames(hdb):
     return tr, frames
 
 
-def nb10_lgbm(tr, frames, level=None):
+def part23_lgbm(tr, frames, level=None):
     """E0 and E1 (E0 + `oof` premiums) LightGBM, predictions keyed by row_id.
 
-    level=None keeps `MONTH_INDEX` (notebook 10's E0/E1). A level method instead fits rent / level
-    without `MONTH_INDEX`, weighted by level squared (notebook 10's E6)."""
+    level=None keeps `MONTH_INDEX` (Part 2.3's E0/E1). A level method instead fits rent / level
+    without `MONTH_INDEX`, weighted by level squared (Part 2.3's E6)."""
     time_col = [] if level else ["MONTH_INDEX"]
     num, cat = ["FLOOR_AREA_SQM", "LEASE_COMMENCE_DATE"] + time_col + cmp.DIST, ["TOWN", "FLAT_TYPE", "FLAT_MODEL"]
     categories = {c: pd.CategoricalDtype(sorted(tr[c].unique())) for c in cat}
@@ -111,7 +111,7 @@ def nb10_lgbm(tr, frames, level=None):
         return X
 
     preds, rows = {}, []
-    for name, extra in [("nb10_E0_LightGBM", []), ("nb10_E1_LightGBM", PREM)]:
+    for name, extra in [("part23_E0_LightGBM", []), ("part23_E1_LightGBM", PREM)]:
         for split, (fit_df, val_df, _) in frames.items():
             est = lgb.LGBMRegressor(**cmp.LGBM_TUNED, verbose=-1, n_jobs=-1, random_state=0)
             if level:
@@ -162,9 +162,9 @@ def main():
         out = out / f"level-{args.level}{'_same' if args.same_level else ''}_seed{args.seed}"
     out.mkdir(parents=True, exist_ok=True)
 
-    hdb = cmp.nb10_block_table()
-    tr, frames = nb10_premium_frames(hdb)
-    gb_preds, results = nb10_lgbm(tr, frames, args.level if args.same_level else None)
+    hdb = cmp.part23_block_table()
+    tr, frames = part23_premium_frames(hdb)
+    gb_preds, results = part23_lgbm(tr, frames, args.level if args.same_level else None)
     for r in results:
         print("REFERENCE", r, flush=True)
 
@@ -195,7 +195,7 @@ def main():
             if prem == "row+node":
                 blocks[NODE_PREM] = node_prem[s]  # read by prepare when it builds node features
             bundles[s] = cmp.prepare(f, [v], args.level, block_num, record_extra)
-        partner = "nb10_E0_LightGBM" if prem == "none" else "nb10_E1_LightGBM"
+        partner = "part23_E0_LightGBM" if prem == "none" else "part23_E1_LightGBM"
         for kind in args.models.split(","):
             tags = dict(model=kind, premiums=prem, seed=args.seed)
             start = time.monotonic()
@@ -229,8 +229,8 @@ def main():
     table["weight"] = r[r.split == "holdout"].set_index(["model", "premiums"])["weight"].reindex(table.index) \
         if "weight" in r else np.nan
     for ref in ["E0", "E1"]:
-        table[f"holdout vs {ref}"] = table["holdout"] - table.loc[(f"nb10_{ref}_LightGBM", "none" if ref == "E0" else "row"), "holdout"]
-    print("\nRMSE (SGD), notebook 10 windows\n", table.round(2).to_string(), flush=True)
+        table[f"holdout vs {ref}"] = table["holdout"] - table.loc[(f"part23_{ref}_LightGBM", "none" if ref == "E0" else "row"), "holdout"]
+    print("\nRMSE (SGD), Part 2.3 windows\n", table.round(2).to_string(), flush=True)
     table.round(2).to_csv(out / "summary.csv")
 
 

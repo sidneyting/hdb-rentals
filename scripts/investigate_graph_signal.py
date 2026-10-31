@@ -1,4 +1,4 @@
-"""Leakage-controlled diagnostics for notebook 09's graph experiments.
+"""Leakage-controlled diagnostics for the earlier graph experiments.
 
 Run from the repository root with PYTHONPATH=src. Requires the saved 08/09
 artifacts. No neural models are trained; LightGBM baselines are reconstructed
@@ -246,7 +246,7 @@ if __name__=='__main__':
     (OUT/'config.json').write_text(json.dumps(dict(source_model_trees=250,source_origins=['2022-07','2023-01','2023-07'],
         source_period='2022-07 through 2023-12',source_residuals='adjusted units; centered within source month',
         correction_grid=dict(kinds=['own_block','subzone','neighbors','distance_neighbors'],tau=[5,20],strength=[0,.25,.5,1]),
-        distance_decay_km=.3,baseline='notebook09 LightGBM selected tree counts',
+        distance_decay_km=.3,baseline='earlier LightGBM selected tree counts',
         subzone='extra categorical feature; tree count independently inner-tuned',
         outer_warning='previously inspected comparison window, not an untouched final test'),indent=2))
     print('COMPLETE',flush=True)

@@ -3,7 +3,7 @@
 PYTHONPATH=src python scripts/experiment_weighted_gnns.py
 Set HDB_WEIGHTED_GNN_SMOKE=1 for a separate short execution check.
 """
-# Import torch first on this Mac to avoid mixed OpenMP import-order crashes.
+# Import torch first to avoid mixed OpenMP import-order crashes.
 import torch
 from torch import nn
 from pathlib import Path

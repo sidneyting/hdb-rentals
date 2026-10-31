@@ -1,15 +1,15 @@
 model,premiums,tuning,holdout,weight,holdout vs E0,holdout vs E1
-nb10_E0_LightGBM,none,603.6,487.49,,0.0,4.35
-nb10_E1_LightGBM,row,599.79,483.14,,-4.35,0.0
-MLP_matched,none,595.42,488.86,,1.36,5.72
-MLP_matched + E0 blend,none,594.14,486.46,0.75,-1.04,3.32
-GNN_uniform,none,595.35,489.79,,2.3,6.65
-GNN_uniform + E0 blend,none,594.1,487.15,0.75,-0.34,4.02
-MLP_matched,row,590.36,481.62,,-5.87,-1.52
-MLP_matched + E1 blend,row,589.6,480.27,0.8,-7.22,-2.87
-GNN_uniform,row,590.3,482.04,,-5.45,-1.1
-GNN_uniform + E1 blend,row,589.54,480.49,0.8,-7.0,-2.65
+part23_E0_LightGBM,none,603.6,487.49,,0.0,4.35
+part23_E1_LightGBM,row,599.79,483.14,,-4.35,0.0
+MLP_matched,none,595.49,488.9,,1.4,5.76
+MLP_matched + E0 blend,none,594.18,486.5,0.75,-0.99,3.36
+GNN_uniform,none,595.65,490.14,,2.65,7.01
+GNN_uniform + E0 blend,none,594.27,487.14,0.7,-0.35,4.0
+MLP_matched,row,590.31,481.47,,-6.02,-1.67
+MLP_matched + E1 blend,row,589.63,480.18,0.8,-7.32,-2.96
+GNN_uniform,row,590.32,482.04,,-5.45,-1.1
+GNN_uniform + E1 blend,row,589.57,480.5,0.8,-7.0,-2.64
 MLP_matched,row+node,603.44,496.94,,9.45,13.8
 MLP_matched + E1 blend,row+node,594.21,482.87,0.45,-4.62,-0.27
-GNN_uniform,row+node,602.84,495.91,,8.41,12.77
+GNN_uniform,row+node,602.84,495.9,,8.41,12.76
 GNN_uniform + E1 blend,row+node,593.96,482.78,0.45,-4.72,-0.36

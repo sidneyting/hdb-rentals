@@ -20,5 +20,9 @@ Run the notebooks in `notebooks/` top to bottom, in this order. Each one maps to
 | `2_models.ipynb` | Data Mining Methods | Baseline pipeline, model families and tuning, block premiums and final LightGBM, GNNs (runs `scripts/*gnn*.py`) |
 | `3_evaluation.ipynb` | Evaluation & Interpretation | Market-level robustness, GNN interpretability, neighbour premiums |
 
+`overall_idea.md` is the guiding story for the report.
+
+`outputs/08_graph_amenities/`, `outputs/09_graph_block_evaluation/` and the saved models under `outputs/11_interpretability/` and `outputs/12_interpretability_premiums/` are committed inputs: Part 2.4 reads the first two, and Parts 3.2 and 3.3 load the saved models unless `RETRAIN = True`.
+
 Shared code is in `src/hdb_rentals/` (installed by `uv sync`), GNN experiments in `scripts/`, tests in `tests/`.
 `notebooks/archive/` holds the original per-topic notebooks the three above were merged from; they are kept for history and are not meant to be run from there.

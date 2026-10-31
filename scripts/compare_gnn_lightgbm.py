@@ -1,19 +1,19 @@
-"""GNN vs notebook 10 on notebook 10's own splits, rows and (optionally) block features.
+"""GNN vs Part 2.3 on Part 2.3's own splits, rows and (optionally) block features.
 
-    uv run python scripts/compare_gnn_nb10.py            # full run
-    uv run python scripts/compare_gnn_nb10.py --smoke    # 3 epochs, a quick execution check
+    uv run python scripts/compare_gnn_lightgbm.py            # full run
+    uv run python scripts/compare_gnn_lightgbm.py --smoke    # 3 epochs, a quick execution check
 
-Windows are notebook 10's (cells [4] and [6]):
+Windows are Part 2.3:
     tuning   fit 2021-01..2023-03, score 2023-04..2023-12 -> GNN early stopping (epoch count)
     holdout  fit 2021-01..2023-12, score 2024-01..2025-03 -> the reported RMSE
 The GNN is refit on the holdout fit rows for the epoch count chosen on the tuning split,
 as experiment_weighted_gnns.py does. Notebook 10's E0 LightGBM is re-run here first; it must
 reproduce the notebook's 603.6 / 487.5, which checks that both sides score the same rows.
 
-Arms (one seed each, as notebook 10 reports one LightGBM run):
+Arms (one seed each, as Part 2.3 reports one LightGBM run):
     level     how rent / market level is carried past the last fit month: damped (the GNN
-              scripts' default) or blend (notebook 10's E6 choice)
-    features  gnn = the GNN's block table as-is; nb10 = plus notebook 10's block columns the
+              scripts' default) or blend (Part 2.3's E6 choice)
+    features  gnn = the GNN's block table as-is; part23 = plus Part 2.3's block columns the
               GNN lacks (hawker, CBD distance, MRT interchange)
     model     GNN_uniform, and MLP_matched (same network with the graph switched off)
 Notebook 10's block / street premiums are not added; compare with E0, not E5/S1.
@@ -35,12 +35,12 @@ import pandas as pd  # noqa: E402
 import torch  # noqa: E402
 from hdb_rentals.rent_adjustment import MarketRentAdjustment  # noqa: E402
 
-OUT = ROOT / "outputs" / "gnn_vs_nb10"
+OUT = ROOT / "outputs" / "gnn_vs_lightgbm"
 DATA, CLEANED = ROOT / "data", ROOT / "cleaned"
 TARGET, KEY = "MONTHLY_RENT", ["TOWN", "BLOCK", "STREET"]
 TUNE_START, HOLD_START, HOLD_END = pd.Timestamp("2023-04-01"), pd.Timestamp("2024-01-01"), pd.Timestamp("2025-04-01")
 
-# ---------------------------------------------------------------- notebook 10, cell [3]
+# ---------------------------------------------------------------- Part 2.3
 # Copied, not imported, so these numbers are built exactly as the notebook builds them.
 
 
@@ -67,7 +67,7 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return 2 * 6371.0 * np.arcsin(np.sqrt(a))
 
 
-def nb10_block_table():
+def part23_block_table():
     hdb = pd.read_csv(CLEANED / "sg_hdb_block_cleaned.csv", dtype={"POSTAL_CODE": str})
     mrt = pd.read_csv(CLEANED / "sg_mrt_stations_cleaned.csv")
     schools = pd.read_csv(CLEANED / "sg_schools_cleaned.csv")
@@ -107,16 +107,16 @@ DIST = [
     "malls_within_1km", "malls_nearest_km", "hawker_within_1km", "hawker_nearest_km", "dist_to_cbd_km",
 ]
 # The DIST columns the GNN's block table has no counterpart for.
-NB10_EXTRA = ["hawker_nearest_km", "hawker_within_1km", "dist_to_cbd_km",
+PART23_EXTRA = ["hawker_nearest_km", "hawker_within_1km", "dist_to_cbd_km",
               "mrt_interchange_nearest_km", "mrt_interchange_within_1km"]
 
-# ---------------------------------------------------------------- notebook 10, cells [4] and [6]: E0
+# ---------------------------------------------------------------- Part 2.3: E0
 LGBM_TUNED = {"num_leaves": 63, "min_child_samples": 100, "subsample": 0.85, "subsample_freq": 1,
               "colsample_bytree": 0.5, "reg_lambda": 20.0, "cat_smooth": 30.0, "n_estimators": 357,
               "learning_rate": 0.05}
 
 
-def nb10_e0(hdb):
+def part23_e0(hdb):
     tr = clean_rent(pd.read_csv(DATA / "train.csv")).sort_values("MONTH_INDEX", kind="stable").reset_index(drop=True)
     tr = tr.merge(hdb[KEY + DIST + ["LATITUDE", "LONGITUDE"]], on=KEY, how="left", validate="m:1")
     num, cat = ["FLOOR_AREA_SQM", "LEASE_COMMENCE_DATE", "MONTH_INDEX"] + DIST, ["TOWN", "FLAT_TYPE", "FLAT_MODEL"]
@@ -134,7 +134,7 @@ def nb10_e0(hdb):
         fit_df, val_df = tr[d < start], tr[(d >= start) & (d < end)]
         est = lgb.LGBMRegressor(**LGBM_TUNED, verbose=-1, n_jobs=-1, random_state=0)
         p = est.fit(matrix(fit_df), fit_df[TARGET].to_numpy()).predict(matrix(val_df))
-        rows.append(dict(split=split, model="nb10_E0_LightGBM", level="MONTH_INDEX", features="nb10",
+        rows.append(dict(split=split, model="part23_E0_LightGBM", level="MONTH_INDEX", features="part23",
                          n_rows=len(val_df), **ewg.metrics(val_df[TARGET], p)))
     return rows
 
@@ -169,7 +169,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true", help="3 epochs, patience 2, small row samples")
     ap.add_argument("--levels", default="damped,blend")
-    ap.add_argument("--features", default="gnn,nb10")
+    ap.add_argument("--features", default="gnn,part23")
     ap.add_argument("--models", default="MLP_matched,GNN_uniform")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--max-epochs", type=int, default=320)
@@ -182,19 +182,19 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
 
     # Notebook 10's block columns onto the GNN's block table, by town + block + street.
-    hdb = nb10_block_table()
+    hdb = part23_block_table()
     blocks = ewg.blocks
-    extra = lower_strip(hdb[KEY + NB10_EXTRA])
+    extra = lower_strip(hdb[KEY + PART23_EXTRA])
     merged = blocks[KEY].merge(extra, on=KEY, how="left", validate="m:1")
     assert len(merged) == len(blocks)
-    for c in NB10_EXTRA:
+    for c in PART23_EXTRA:
         blocks[c] = merged[c].to_numpy(float)
     rented = blocks.block_id.isin(ewg.rent.block_id)
-    print(f"nb10 columns matched for {blocks.loc[rented, NB10_EXTRA[0]].notna().mean():.1%} of rented blocks, "
-          f"{blocks[NB10_EXTRA[0]].notna().mean():.1%} of all {len(blocks):,} graph blocks", flush=True)
-    feature_sets = {"gnn": list(ewg.BLOCK_NUM), "nb10": list(ewg.BLOCK_NUM) + NB10_EXTRA}
+    print(f"part23 columns matched for {blocks.loc[rented, PART23_EXTRA[0]].notna().mean():.1%} of rented blocks, "
+          f"{blocks[PART23_EXTRA[0]].notna().mean():.1%} of all {len(blocks):,} graph blocks", flush=True)
+    feature_sets = {"gnn": list(ewg.BLOCK_NUM), "part23": list(ewg.BLOCK_NUM) + PART23_EXTRA}
 
-    results = nb10_e0(hdb)
+    results = part23_e0(hdb)
     for r in results:
         print("REFERENCE", r, flush=True)
 
@@ -210,7 +210,7 @@ def main():
 
     config = dict(vars(args), max_epochs=max_epochs, patience=ewg.PATIENCE, hidden=ewg.HIDDEN,
                   tuning=[str(TUNE_START.date()), str(HOLD_START.date())],
-                  holdout=[str(HOLD_START.date()), str(HOLD_END.date())], nb10_extra=NB10_EXTRA,
+                  holdout=[str(HOLD_START.date()), str(HOLD_END.date())], part23_extra=PART23_EXTRA,
                   torch_version=torch.__version__)
     (out / "config.json").write_text(json.dumps(config, indent=2))
 
@@ -242,8 +242,8 @@ def main():
     arms = r[["model", "level", "features"]].drop_duplicates()
     table = r.set_index(["model", "level", "features", "split"])["rmse"].unstack("split")
     table = table.reindex(pd.MultiIndex.from_frame(arms))[["tuning", "holdout"]]
-    table["holdout vs E0"] = table["holdout"] - table.loc[("nb10_E0_LightGBM", "MONTH_INDEX", "nb10"), "holdout"]
-    print("\nRMSE (SGD), notebook 10 windows\n", table.round(2).to_string(), flush=True)
+    table["holdout vs E0"] = table["holdout"] - table.loc[("part23_E0_LightGBM", "MONTH_INDEX", "part23"), "holdout"]
+    print("\nRMSE (SGD), Part 2.3 windows\n", table.round(2).to_string(), flush=True)
     table.round(2).to_csv(out / "summary.csv")
 
 

@@ -103,7 +103,7 @@ def forecast_level(level: pd.Series, months: np.ndarray, method: str) -> pd.Seri
         ).fit()
         future = fit.forecast(len(ahead))
         if method == "blend":
-            # Average of hold and damped in log space, as notebook 10 (E6) uses.
+            # Average of hold and damped in log space, as Part 2.3 (E6) uses.
             future = (np.full(len(ahead), level.iloc[-1]) + future) / 2
     elif method == "linear":
         slope, intercept = np.polyfit(level.index, level.to_numpy(), 1)
