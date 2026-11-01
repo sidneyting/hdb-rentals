@@ -22,6 +22,6 @@ Run the notebooks in `notebooks/` top to bottom, in this order. Each one maps to
 
 `overall_idea.md` is the guiding story for the report.
 
-`outputs/08_graph_amenities/`, `outputs/09_graph_block_evaluation/` and the saved models under `outputs/11_interpretability/` and `outputs/12_interpretability_premiums/` are committed inputs: Part 2.4 reads the first two, and Parts 3.2 and 3.3 load the saved models unless `RETRAIN = True`.
+`outputs/08_graph_amenities/`, `outputs/09_graph_block_evaluation/` and the saved models under `outputs/11_interpretability/` and `outputs/12_interpretability_premiums/` are committed inputs: Part 2.4 reads the first two, and Parts 3.2 and 3.3 load the saved models unless `RETRAIN = True`. `outputs/report_level/`, written by `scripts/report_level_eval.py`, is also committed: Part 3.1 Appendix D reads it for the report's market-level numbers. `outputs/13_interpretability_table2/`, written by `scripts/explain_table2_gnn.py`, is committed too: the end of Part 3.3 reads it.
 
 Shared code is in `src/hdb_rentals/` (installed by `uv sync`), GNN experiments in `scripts/`, tests in `tests/`.

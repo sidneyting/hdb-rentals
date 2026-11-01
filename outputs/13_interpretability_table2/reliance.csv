@@ -1,0 +1,5 @@
+model,neighbour share,neighbour share of net effects,mean moved with no edges
+GNN seed 0,0.165,0.084,50.672
+GNN seed 1,0.196,0.093,57.207
+GNN seed 2,0.187,0.089,51.868
+MLP,0.0,0.0,0.0

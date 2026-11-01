@@ -1,0 +1,6 @@
+model,holdout rmse,table ii run
+GNN seed 0,482.04,482.07
+GNN seed 1,481.74,481.73
+GNN seed 2,482.33,482.3
+MLP,481.73,481.73
+LightGBM,481.65,481.65

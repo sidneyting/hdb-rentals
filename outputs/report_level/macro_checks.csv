@@ -1,0 +1,23 @@
+check,seed,arm,rmse
+"tuned, seed",0,month index,487.49
+"tuned, seed",0,+ COE,522.57
+"tuned, seed",0,+ shares,489.25
+"tuned, seed",0,+ placebo,489.58
+"tuned, seed",1,month index,487.76
+"tuned, seed",1,+ COE,543.03
+"tuned, seed",1,+ shares,490.09
+"tuned, seed",1,+ placebo,489.53
+"tuned, seed",2,month index,487.65
+"tuned, seed",2,+ COE,521.17
+"tuned, seed",2,+ shares,489.75
+"tuned, seed",2,+ placebo,489.01
+"tuned, seed",3,month index,487.64
+"tuned, seed",3,+ COE,507.2
+"tuned, seed",3,+ shares,493.07
+"tuned, seed",3,+ placebo,489.4
+"tuned, seed",4,month index,488.28
+"tuned, seed",4,+ COE,556.71
+"tuned, seed",4,+ shares,488.71
+"tuned, seed",4,+ placebo,489.27
+untuned settings,0,month index,491.07
+untuned settings,0,+ COE,488.54
