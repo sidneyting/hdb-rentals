@@ -6,7 +6,7 @@ The guiding story for the report. Every section should fit into it; anything tha
 
 **Rent = market level x flat premium.**
 
-- **Market level:** one number per month. Test months are in the future, so the level has to be carried forward. This is the hard part of the task. Forecasting it (the `blend` level) fixes the far-ahead under-prediction on the holdout, but the leaderboard disagrees (Part 2.3: S3 439.5 vs S1 436.8 with the frozen level; S3 also includes E7 to E9, and S2, the level alone, has no recorded score), so the level stays a known limitation and the validated submission is Part 2.3's S1, on the frozen level.
+- **Market level:** one number per month. Test months are in the future, so the level has to be carried forward. This is the hard part of the task. Forecasting it (the `blend` level) fixes the far-ahead under-prediction on the holdout, but the leaderboard disagrees (Part 2.3: S3 439.5 vs S1 436.8 with the frozen level; S2, the level alone, scored 439.7), so the level stays a known limitation and the validated submission is Part 2.3's S1, on the frozen level.
 - **Flat premium:** stable over time (street premiums r = 0.83 quarter to quarter, Part 1.1 §7.3), so it can be learned once from flat attributes and location. Distance features give the first location gain (Part 1.7); the block's own past rentals (block + flat type premiums, Part 2.3 E1) add the largest gain on top of them.
 
 ## The four steps
