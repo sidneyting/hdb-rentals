@@ -1,0 +1,39 @@
+\section{Models}
+\label{sec:models}
+
+Every model here uses the splits of Section~\ref{sec:holdout}. We start with tabular models to see what carries signal, then test whether connections between blocks add anything, and finally average the two kinds of model.
+
+\subsection{LightGBM and Block Premiums}
+\label{sec:lightgbm}
+
+We first compared model families at default settings on the holdout period. LightGBM \cite{Ke:2017:LightGBM} scored 489.6, ahead of histogram gradient boosting (490.7), XGBoost \cite{Chen:2016:XGBoost} (496.7), CatBoost \cite{Prokhorenkova:2018:CatBoost} (498.4), random forest (503.3) and linear regression (652.6). We tuned LightGBM, XGBoost and CatBoost with the search of Section~\ref{sec:holdout}, leaving out histogram gradient boosting since it is the same kind of algorithm as LightGBM. Tuning brought LightGBM to 487.5, XGBoost to 489.6 and CatBoost to 490.4. The tuning split could not separate them, at 602 to 603, so the choice of LightGBM rests on the holdout, which is therefore not untouched. Averaging the three gained nothing, because their errors correlate at 0.99 and two of them are 2 to 3 behind LightGBM.
+
+Flat premiums look stable over time: the premium of a street correlates at 0.83 from one quarter to the next. A block's own past rentals should therefore carry some signal, though a diagnostic with the actual level suggested a gain of only a few dollars. We add three columns: a block premium, a block and flat type premium, and the number of training rows behind the latter, so that the tree can tell a premium built on 30 rentals from one built on a single rental. Relative rent is a rental's rent divided by the median for its month and flat type. Premiums are smoothed averages of relative rent, so a group with few rows is pulled toward the level above it, with a weight of 20 rows for a block and 5 rows for a block and flat type.
+
+To avoid leakage, each training row's premium comes from a five-fold split, so its own rent does not enter its own premium, apart from a negligible share through its month's median. Scored rows use all training rows, and their rents are never used. This model scores 483.1 on the holdout and is the model we submit, refit on all of the training data. We also tested coordinates, recency weighting, and the premiums of the ten nearest blocks. The last helped slightly on its own (1.2 on tuning, 1.0 on holdout), but none of them beat block premiums alone once combined, so none were kept. That small gain also suggested that a graph would add little.
+
+\subsection{Graph Neural Network}
+\label{sec:gnn}
+
+We use a graph neural network to test whether connections between blocks improve prediction. The graph has one node for each of the 9,464 HDB blocks. Each block is joined to its 8 nearest blocks within 1 km, and the links are made symmetric, giving 43,966 edges, about 9 neighbours per block and a median edge of 115 m. Each rental is scored through two message-passing layers \cite{Gilmer:2017:MessagePassing} of size 64 over its block, each with a learned gate on the incoming message, then a head that combines the block's embedding with the rental's floor area, flat age, flat type and flat model. Edges are weighted equally, and each block averages over its neighbours.
+
+The networks use the graph's own block table: coordinates, town, planning area, subzone, building height and year, and nearby MRT, school and mall counts and distances. This differs from LightGBM's 13 columns, adding coordinates and leaving out hawker, CBD and MRT interchange columns. Restoring those columns moved RMSE by under 1 (one seed, no premiums). The network learns rent divided by the market level of Section~\ref{sec:level}, weighted by the level squared so that the loss matches RMSE in dollars. It uses AdamW \cite{Loshchilov:2019:AdamW} at a learning rate of 0.001, weight decay of 0.0001 and dropout of 0.2. The number of epochs is chosen by early stopping on the tuning split, with a patience of 30 and a limit of 320, and the network is then refit on the holdout's training rows. We report the mean of three seeds.
+
+The control is the same network with neighbour aggregation switched off, which we call the MLP. Any gain that the GNN has over the MLP can then come only from the graph. Both networks can take the block premiums of Section~\ref{sec:lightgbm} as inputs at the head. Putting premiums into the nodes instead was rejected: a training row can then read its own rent, and it scored far worse (495.9).
+
+Accuracy alone may not separate the two networks, since every block already has its own location features and nearly all have their own history. We therefore ran these tests, with rules set in advance. A gap counts only if its mean exceeds twice its standard deviation over three seeds, which is a rough screen and not a formal test.
+
+\begin{itemize}
+\item \emph{Spatial correlation:} do nearby blocks have similar premiums? With no model involved, this asks whether there is any signal for a graph to use.
+\item \emph{Shuffled edges:} relabel blocks at random, keeping the graph's shape. If real neighbours matter, shuffling should cost accuracy.
+\item \emph{Unseen blocks:} remove all rentals of a random 20\% of blocks from the training rows and score their holdout rows. If neighbours matter anywhere, it should be here.
+\item \emph{Neighbours' premiums:} a separate one-hop channel gives a block the mean premium of its neighbours. It is one hop so that a block's own premium cannot come back to it. We add it to both networks, so the MLP with the channel uses neighbours' premiums without message passing and separates the two effects.
+\item \emph{Planted effect:} add a known neighbour effect to the rents. This shows how large a true effect the GNN could detect, so that a null result means something.
+\end{itemize}
+
+\subsection{Tree and Neural Blend}
+\label{sec:blend}
+
+Finally, we take a weighted average of LightGBM and each neural model, with the weight picked on the tuning split. We count it as a real gain only if the weight is strictly between 0 and 1 and the blend beats LightGBM on the holdout by more than twice the seed standard deviation. For this comparison all models learn rent divided by the average level of Section~\ref{sec:level}, weighted by the level squared. They then share the level, rows and premium columns, though not the block table above.
+
+% Data Mining Methods. Describe how you chose and applied appropriate data mining techniques. This description should include which techniques you used, how you chose their hyperparameters, etc. Note that you do not need to explain the techniques themselves. However, in case of more advanced methods or models, you should add relevant references.

@@ -1,0 +1,54 @@
+\section{Evaluation}
+
+\subsection{Results}
+\label{sec:results}
+
+Table~\ref{tab:results} compares the models on the holdout period. Only rows on the same market level are comparable. Distance features brought LightGBM from 496.4 on the base columns to 489.6, and tuning brought it to 487.5. These features were selected on this holdout, so that gain is somewhat optimistic. Block premiums reach 483.1 on the month index. On the average level they gain 1.8 on the holdout, with no gain on the tuning split (593.25 to 593.95), so most of their gain is tied to the month-index setup.
+
+\begin{table}[htbp]
+\caption{Holdout RMSE (trained January 2021 to December 2023, scored January 2024 to March 2025). Neural rows are means of three seeds, with the standard deviation in brackets. Average-level rows are weighted by the level squared. Bias is mean prediction minus actual rent in dollars.}
+\begin{center}
+\begin{tabular}{|l|r|r|}
+\hline
+\textbf{Model} & \textbf{RMSE} & \textbf{Bias} \\
+\hline
+\multicolumn{3}{|l|}{\emph{Month index}} \\
+LightGBM & 487.5 & $-35$ \\
+\textbf{LightGBM + premiums (submitted)} & \textbf{483.1} & $-37$ \\
+\hline
+\multicolumn{3}{|l|}{\emph{Average level}} \\
+LightGBM & 483.5 & $+6$ \\
+LightGBM + premiums & 481.7 & $+3$ \\
+GNN + premiums & 482.0 (0.3) & $-9$ \\
+GNN + premiums, shuffled edges & 482.0 (0.4) & $-8$ \\
+MLP + premiums & 481.8 (0.2) & $-9$ \\
+GNN + LightGBM blend & 480.3 (0.1) & $-3$ \\
+MLP + LightGBM blend & 480.2 (0.0) & $-3$ \\
+\hline
+\end{tabular}
+\label{tab:results}
+\end{center}
+\end{table}
+
+\emph{The graph does not improve prediction.} The GNN and the MLP differ by 0.2 alone and by 0.1 when blended, and shuffling the edges at random leaves the GNN at 482.0. This null result has some power: in the planted test, which uses the damped trend level, no premiums and a random effect unrelated to location (the easy case), the GNN detected an effect with a standard deviation of \$25, drew level with the MLP at \$51 and passed it at \$76. So the graph could have shown a gain of that size. Nearby blocks do have similar rents: raw block premiums correlate at 0.69 for blocks under 100 m apart, against about zero for shuffled premiums. Within a town the correlation is 0.45 under 100 m and is gone by 500 m to 1 km. Nearby blocks may also share age, height and flat mix, so this shows similarity and not spillover. The results are consistent with a block's own features already carrying this signal.
+
+\emph{Neighbours help little, and only without history.} On unseen blocks, neighbours' premiums gain about 0.2\% for the MLP (1.2, against a threshold of 0.8) and do not clear the screen for the GNN (0.5, against 0.6). There is no such gain on seen blocks. Shuffling the neighbours costs the MLP's channel 1.3 (against 1.0), the one result showing that real neighbours matter, and only through their premiums. Message passing adds nothing on top. These cases are rare: 0.56\% of holdout rows and 0.20\% of test rows have no training rentals in their block, and 1.44\% and 0.77\% have none of the same block and flat type, so they cannot move overall RMSE.
+
+One result was not covered by our rules, so we treat it as exploratory. On unseen blocks the neural models beat LightGBM, 499 against 519 (three different block sets), with or without a graph. The networks have coordinates and subzone, and their epochs were chosen on the held blocks' tuning rows, while LightGBM kept fixed settings, so the gap may come from either.
+
+\emph{Averaging gives a small gain.} The tuning split picks weights of 0.50 to 0.55 for the neural model, and the blend gains 1.3 to 1.4 over LightGBM with premiums, or 0.3\%. This exceeds twice the seed standard deviation, so it meets our rule. The tuning split moves the same way (593.95 to 592.6), though the weight was chosen there. The blend has not been submitted, and it uses the average level.
+
+\subsection{Discussion}
+\label{sec:discussion}
+
+No model separates itself on the holdout: the average-level models are within 2 of one another, and the blends score lowest. We submit LightGBM with block premiums on the month index for the reason given in Section~\ref{sec:level-results}, and it is simple and fast to refit. The neural models alone do not beat LightGBM on one market level. A variant on the average level with more premiums and retuned settings reached 480.8, but it shares the level that scored worse. The premiums' gain is consistent with the stability of location premiums, although we did not test that link directly.
+
+The blend's gain comes from averaging a tree with a neural model, and not from the graph, since the MLP blends equally well. Unlike the three boosters, which were 2 to 3 apart, these models are equally accurate, and two such models with an error correlation of 0.988 are expected to gain about this much. We also checked whether one model is better on sparse history and the other on long history. It is not so: LightGBM is ahead for 1 to 10 rentals and the GNN at 0 and above 10, all by about 2 or less.
+
+The models are weak in two ways. The first is bias far ahead in time, although RMSE falls because later rents are less spread out. The submitted model under-predicts by \$37 on the holdout, and the frozen level is the likely cause, since the level forecasts have smaller bias. The origins of Fig.~\ref{fig:level-backtest} suggest that a renewed climb would cost far more, though they use the model without premiums. The second is locations with little history: rows with no rentals of the same block and flat type score about 576, and in the unseen-block stress test on the average level LightGBM's RMSE rises from 483 to 519.
+
+Forecasting the level is unlikely to reduce RMSE much in a flat market. With an oracle level, the model without premiums still scores about 485, so most of its error is not level error. Part of the rest is likely to lie between flats that the data cannot distinguish, since unit numbers are omitted and storey and condition within a block are unknown, but we did not test this. We would therefore suggest data on the unit itself as the next step, and a level forecast only with more history than one climb and one flattening. Our own tests have limits too: three seeds give a rough screen, and one holdout period may not represent the test months.
+
+For the stakeholders of Section~I, an RMSE of about \$480 a month (a mean absolute error of about \$355) suggests that the model can give a reference rent for a flat, but not settle a price on its own. It should not be read as a view of where the market is heading, since the submitted model holds rents at their last observed level.
+
+% Discuss which method(s) performed best and why. Understand in what cases your methods perform bad, and discuss principle limitations and potential future steps for improvement.
