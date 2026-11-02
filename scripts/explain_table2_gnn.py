@@ -1,6 +1,6 @@
 """Explain the model the report scores: GNN_uniform with `row` premiums on the `blend` level.
 
-    uv run python scripts/explain_table2_gnn.py
+    uv run python scripts/explain_table2_gnn.py [--level hold]
 
 Same frames, inputs, level and epoch counts as `gnn_premiums_blend.py --premiums row --level blend
 --same-level` (seeds 0, 1, 2), with Part 3.2's explainer and checks. The own-block premiums are row
@@ -29,9 +29,12 @@ from hdb_rentals.explain import SubgraphExplainer  # noqa: E402
 from scipy.stats import spearmanr  # noqa: E402
 
 cmp, ewg = pb.cmp, pb.ewg
+LEVEL = "hold" if "--level" in sys.argv and sys.argv[sys.argv.index("--level") + 1] == "hold" else "blend"
 OUT = ROOT / "outputs" / "13_interpretability_table2"
-LEVEL, SEEDS, N_ROWS, N_PER_BUCKET, IG_STEPS = "blend", [0, 1, 2], 400, 120, 32
-RESULTS = ROOT / "outputs" / "gnn_premiums_blend" / "level-blend_same_seed{}" / "results.csv"
+if LEVEL != "blend":
+    OUT = OUT / f"level-{LEVEL}"
+SEEDS, N_ROWS, N_PER_BUCKET, IG_STEPS = [0, 1, 2], 400, 120, 32
+RESULTS = ROOT / "outputs" / "gnn_premiums_blend" / f"level-{LEVEL}_same_seed{{}}" / "results.csv"
 BLOCK_CAT = ewg.BLOCK_CAT + ["SUBZONE"]
 RECORD_NUM, RECORD_CAT = ["FLOOR_AREA_SQM", "FLAT_AGE", *pb.PREM], ["FLAT_TYPE", "FLAT_MODEL"]
 FLAT_FAMS = ["Floor area", "Flat type", "Flat model", "Flat age"]

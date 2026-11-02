@@ -151,7 +151,7 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--max-epochs", type=int, default=320)
     ap.add_argument("--threads", type=int, default=4)
-    ap.add_argument("--level", default="damped", choices=["damped", "blend"])
+    ap.add_argument("--level", default="damped", choices=["damped", "blend", "hold"])
     ap.add_argument("--same-level", action="store_true", help="LightGBM uses the neural model's level")
     args = ap.parse_args()
     max_epochs = 3 if args.smoke else args.max_epochs

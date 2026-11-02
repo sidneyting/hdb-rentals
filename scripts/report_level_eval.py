@@ -12,6 +12,7 @@ month index needs this order. Writes outputs/report_level/:
     macro_checks.csv     the same over five seeds, and tuned against the older untuned settings
     no_location.csv      the same level change without location features
     rolling.csv          RMSE by forecast origin, each scoring the next 16 months
+    rolling_premiums.csv the same on the submitted model's columns, with block premiums rebuilt per origin
     level_backtest.png   Fig. 1, from rolling.csv
 """
 import sys
@@ -28,6 +29,7 @@ import pandas as pd  # noqa: E402
 from hdb_rentals.baselines import LGBM_PARAMS  # noqa: E402
 from hdb_rentals.macro import load_macro  # noqa: E402
 from hdb_rentals.market_level import forecast_level, hedonic_level  # noqa: E402
+from sklearn.model_selection import KFold  # noqa: E402
 
 OUT = ROOT / "outputs" / "report_level"
 CAT = ["TOWN", "FLAT_TYPE", "FLAT_MODEL"]
@@ -140,6 +142,53 @@ def rolling():
         print(r, flush=True)
 
 
+def block_premiums(fit, val):
+    """Part 2.3 E1 for one origin: `oof` premiums for fit rows, all fit rows for scored rows."""
+    block = (TR["TOWN"].astype(str) + "|" + TR["BLOCK"].astype(str) + "|" + TR["STREET"].astype(str)).astype("category").cat.codes.to_numpy(dtype=np.int64)
+    flat = TR["FLAT_TYPE"].cat.codes.to_numpy(dtype=np.int64)
+    nb, nft = block.max() + 1, flat.max() + 1
+    group = block * nft + flat
+    rel = Y / TR.groupby(["MONTH_INDEX", "FLAT_TYPE"], observed=True)[cmp.TARGET].transform("median").to_numpy()
+
+    def encode(src, dst):
+        sb, cb = np.bincount(block[src], rel[src], nb), np.bincount(block[src], minlength=nb)
+        sg, cg = np.bincount(group[src], rel[src], nb * nft), np.bincount(group[src], minlength=nb * nft)
+        pb = (20 + sb[block[dst]]) / (20 + cb[block[dst]])
+        return np.column_stack([pb, (5 * pb + sg[group[dst]]) / (5 + cg[group[dst]]), cg[group[dst]]])
+
+    out = np.full((len(Y), 3), np.nan)
+    for train_idx, own_idx in KFold(5, shuffle=True, random_state=0).split(fit):
+        out[fit[own_idx]] = encode(fit[train_idx], fit[own_idx])
+    out[val] = encode(fit, val)
+    return out
+
+
+def rolling_premiums():
+    """Rolling origins on the submitted model's columns. Level arms weight rows by the level squared, as Part 2.3 E6."""
+    prem = ["BLOCK_PREM", "BLOCK_FT_PREM", "BLOCK_FT_N"]
+    num, time_num = ["FLOOR_AREA_SQM", "LEASE_COMMENCE_DATE"], ["FLOOR_AREA_SQM", "LEASE_COMMENCE_DATE", "MONTH_INDEX"]
+    rows = []
+    for origin in ORIGINS:
+        fit = np.where(MONTHS <= origin)[0]
+        val = np.where((MONTHS > origin) & (MONTHS <= origin + 16))[0]
+        frame = TR.copy()
+        frame[prem] = block_premiums(fit, val)
+
+        def run(cols, scale=None):
+            s = np.ones(len(Y)) if scale is None else scale
+            est = lgb.LGBMRegressor(**cmp.LGBM_TUNED, verbose=-1, n_jobs=-1, random_state=0)
+            weight = None if scale is None else s[fit] ** 2
+            est.fit(frame[cols].iloc[fit], Y[fit] / s[fit], sample_weight=weight)
+            return est.predict(frame[cols].iloc[val]) * s[val]
+
+        r = {"origin": origin, "month index": rmse(run([*time_num, *cmp.DIST, *prem, *CAT]), Y[val])}
+        for level in LEVELS:
+            r[level] = rmse(run([*num, *cmp.DIST, *prem, *CAT], level_scale(level, fit, val)), Y[val])
+        rows.append(r)
+        pd.DataFrame(rows).round(2).to_csv(OUT / "rolling_premiums.csv", index=False)
+        print(r, flush=True)
+
+
 def figure():
     r = pd.read_csv(OUT / "rolling.csv")
     ink, ink_2, muted, grid, axis, surface = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7", "#fcfcfb"
@@ -173,8 +222,11 @@ def figure():
 
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    holdout_tables()
-    if "--holdout-only" not in sys.argv:
-        rolling()
-        figure()
+    if "--rolling-premiums" in sys.argv:
+        rolling_premiums()
+    else:
+        holdout_tables()
+        if "--holdout-only" not in sys.argv:
+            rolling()
+            figure()
     print("DONE")

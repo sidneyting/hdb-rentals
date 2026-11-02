@@ -267,7 +267,7 @@ def summarise(out):
              ("R3 real neighbours matter, GNN row", arm("GNN_uniform", "row", "shuffled") - arm("GNN_uniform", "row")),
              ("R3 real neighbours matter, MLP row+nbr", arm("MLP_matched", "row+nbr", "shuffled") - arm("MLP_matched", "row+nbr"))]
     s = pd.concat([pd.read_csv(p) for p in sorted(out.glob("shuffled_seed*.csv"))]).set_index("seed").sort_index()
-    real = pd.concat([pd.read_csv(ROOT / f"outputs/gnn_premiums_blend/level-blend_same_seed{k}/results.csv").assign(seed=k) for k in s.index])
+    real = pd.concat([pd.read_csv(ROOT / f"outputs/gnn_premiums_blend/level-{LEVEL}_same_seed{k}/results.csv").assign(seed=k) for k in s.index])
     real = real[(real.split == "holdout") & (real.model == "GNN_uniform")].set_index("seed").sort_index()
     rules.append(("R4 real neighbours matter on all rows, GNN row", s["rmse"].to_numpy() - real["rmse"].to_numpy()))
     rule_table = pd.DataFrame([dict(rule=name, **clears(g)) for name, g in rules])
@@ -296,9 +296,13 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--level", default="blend", choices=["blend", "hold"], help="level for unseen and shuffled; other than blend writes to a subfolder")
     args = ap.parse_args()
     torch.set_num_threads(args.threads)
-    out = OUT / "smoke" if args.smoke else OUT
+    global LEVEL
+    LEVEL = args.level
+    base = OUT if LEVEL == "blend" else OUT / f"level-{LEVEL}"
+    out = base / "smoke" if args.smoke else base
     out.mkdir(parents=True, exist_ok=True)
     {"unseen": run_unseen, "shuffled": run_shuffled, "planted": run_planted, "spatial": run_spatial,
      "summary": lambda a, o: summarise(o)}[args.experiment](args, out)
