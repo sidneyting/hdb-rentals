@@ -15,7 +15,13 @@ To avoid leakage, each training row's premium comes from a five-fold split, so i
 \subsection{Graph Neural Network}
 \label{sec:gnn}
 
-We use a graph neural network to test whether connections between blocks improve prediction. The graph has one node for each of the 9,464 HDB blocks. Each block is joined to its 8 nearest blocks within 1 km, and the links are made symmetric, giving 43,966 edges, about 9 neighbours per block and a median edge of 115 m. Each rental is scored through two message-passing layers \cite{Gilmer:2017:MessagePassing} of size 64 over its block, each with a learned gate on the incoming message, then a head that combines the block's embedding with the rental's floor area, flat age, flat type and flat model. Edges are weighted equally, and each block averages over its neighbours.
+We use a graph neural network to test whether connections between blocks improve prediction. The graph has one node for each of the 9,464 HDB blocks. Each block is joined to its 8 nearest blocks within 1 km, and the links are made symmetric, giving 43,966 edges, about 9 neighbours per block and a median edge of 115 m. Each rental is scored through two message-passing layers \cite{Gilmer:2017:MessagePassing} of size 64 over its block, each with a learned gate on the incoming message, then a head that combines the block's embedding with the rental's floor area, flat age, flat type and flat model. Edges are weighted equally, and each block averages over its neighbours. Fig.~\ref{fig:arch} shows the network and the wider pipeline.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{figures/architecture.png}}
+\caption{(a) Our pipeline; every model is scored on the holdout, and LightGBM with premiums is submitted. (b) The GNN for one rental.}
+\label{fig:arch}
+\end{figure}
 
 The networks use the graph's own block table: coordinates, town, planning area, subzone, building height and year, and nearby MRT, school and mall counts and distances. This differs from LightGBM's 13 columns, adding coordinates and leaving out hawker, CBD and MRT interchange columns. Restoring those columns moved RMSE by under 1 (one seed, no premiums). The network learns rent divided by the market level of Section~\ref{sec:level}, weighted by the level squared so that the loss matches RMSE in dollars. It uses AdamW \cite{Loshchilov:2019:AdamW} at a learning rate of 0.001, weight decay of 0.0001 and dropout of 0.2. The number of epochs is chosen by early stopping on the tuning split, with a patience of 30 and a limit of 320, and the network is then refit on the holdout's training rows. We report the mean of three seeds.
 

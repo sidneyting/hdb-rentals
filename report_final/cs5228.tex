@@ -83,9 +83,13 @@ rental price prediction, market level forecasting, gradient boosting, graph neur
 
 \input{sections/5_concl}
 
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\clearpage
 \section*{Appendix}
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \caption{Distribution of Tasks}
 \begin{center}
 \begin{tabular}{|c|p{0.7\columnwidth}|}
@@ -107,6 +111,19 @@ Sidney & Literature review, overall report, interpretability \\
 \label{tab1}
 \end{center}
 \end{table}
+
+\begin{figure}[!ht]
+\centerline{\includegraphics[width=0.85\columnwidth]{figures/planted_recovery.png}}
+\caption{IG attribution on a planted neighbour value against the true planted effect, for a GNN without premiums trained on the planted target, and a control with nothing planted.}
+\label{fig:planted}
+\end{figure}
+
+\begin{figure*}[htbp]
+\centerline{\includegraphics[width=\textwidth]{figures/eda_panel.png}}
+\caption{Distributions in the train set. Panels (a) to (c) show each numerical feature as a histogram with a box plot on the same axis, with outliers beyond the 1.5 IQR whiskers as dots. Panels (d) and (e) show rent by flat type and town, ordered by median, with outliers hidden.}
+\label{fig:eda}
+\end{figure*}
+
 
 
 % \section{Prepare Your Paper Before Styling}
@@ -299,8 +316,6 @@ Sidney & Literature review, overall report, interpretability \\
 % For papers published in translation journals, please give the English 
 % citation first, followed by the original foreign-language citation \cite{b6}.
 
-\bibliographystyle{IEEEtran}
-\bibliography{references}
 
 
 \end{document}

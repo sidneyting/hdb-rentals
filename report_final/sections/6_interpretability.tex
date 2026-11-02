@@ -45,8 +45,3 @@ We set no pass criteria in advance, so we report measured values, on the GNN of 
 
 \emph{Does IG find a true effect?} The data has no ground truth for neighbours, so we planted one, on the GNN without premiums, since a block's premium would be expected to absorb a planted neighbour effect (Fig.~\ref{fig:planted}). This tests the method, not the model of Table~\ref{tab:results}, and only for a random effect unrelated to location, which is the easy case. On one seed, IG ranked neighbours well (0.93 against the truth, per neighbour), but reported about half of the effect's size. A control with nothing planted received \$3.8, and a pure noise input \$9. So IG finds direction and ranking in this setting, its dollar amounts for neighbours understate the effect, and differences under about \$9 should not be read as signal.
 
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=0.85\columnwidth]{figures/planted_recovery.png}}
-\caption{IG attribution on a planted neighbour value against the true planted effect, for a GNN without premiums trained on the planted target, and a control with nothing planted.}
-\label{fig:planted}
-\end{figure}

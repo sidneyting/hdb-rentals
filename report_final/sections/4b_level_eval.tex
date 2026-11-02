@@ -7,6 +7,8 @@
 \subsection{Market-Level Forecasts}
 \label{sec:level-results}
 
+Forecasting the level removes most of the drift on the holdout, but the submitted model stays on the month index, because a test submission that changed only the level scored worse.
+
 \begin{table}[htbp]
 \caption{Level forecasts on the holdout period, using the tuned LightGBM of Section~\ref{sec:holdout}, without block premiums and without level weighting. Bias is mean prediction minus actual rent in dollars, at 1--3 and 13--15 months ahead.}
 \begin{center}
