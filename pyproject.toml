@@ -15,17 +15,11 @@ dependencies = [
     "xgboost>=3.2.0",
     "catboost>=1.2.10",
     "torch>=2.15.0",
+    "nbformat>=5.11.1",
 ]
 
-# Installs src/hdb_rentals in editable mode on `uv sync`, so notebooks can
-# `import hdb_rentals` from any folder.
-[build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [tool.uv]
+# Nothing to install: the shared code lives in notebooks/0_shared_code.ipynb.
+package = false
 # Build .venv on a uv-installed Python, never on whatever conda Python is on PATH.
 python-preference = "only-managed"
