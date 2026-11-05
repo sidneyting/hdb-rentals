@@ -28,6 +28,7 @@ def write_submission(
 
     out = pd.DataFrame({index_name: np.arange(len(preds)), config.TARGET: preds})
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    config.SUBMISSIONS_DIR.mkdir(parents=True, exist_ok=True)
     path = config.SUBMISSIONS_DIR / f"{stamp}_{name}.csv"
     out.to_csv(path, index=False)
     return path

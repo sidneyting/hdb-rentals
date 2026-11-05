@@ -9,7 +9,6 @@ AUX_DIR = DATA_DIR / "auxiliary"
 INTERIM_DIR = DATA_DIR / "interim"
 PROCESSED_DIR = DATA_DIR / "processed"
 
-MODELS_DIR = PROJECT_ROOT / "models"
 SUBMISSIONS_DIR = PROJECT_ROOT / "submissions"
 FIGURES_DIR = PROJECT_ROOT / "reports" / "figures"
 
@@ -41,5 +40,5 @@ BLOCK_KEY = ["TOWN", "BLOCK", "STREET"]
 TRAIN_PERIOD = ("2021-01", "2025-03")
 TEST_PERIOD = ("2025-03", "2026-07")
 
-for _d in (INTERIM_DIR, PROCESSED_DIR, MODELS_DIR, SUBMISSIONS_DIR, FIGURES_DIR):
+for _d in (INTERIM_DIR, PROCESSED_DIR):
     _d.mkdir(parents=True, exist_ok=True)

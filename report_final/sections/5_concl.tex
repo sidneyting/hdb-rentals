@@ -1,7 +1,0 @@
-\section{Conclusion}
-
-We view HDB rent as a market level times a flat premium. Location premiums look stable, and LightGBM with distance features and block premiums reaches a holdout RMSE of 483.1. It is our submitted model, and it holds the level implicitly through a month index. The market level is the hard part of the task. Forecasting it reduces far-ahead bias on the holdout and insures against a turn in the market, but a test submission that changed only the level scored worse, so it remains a known limitation.
-
-A graph neural network matches LightGBM on accuracy, but so does the same network without the graph, and shuffled edges change nothing. Nearby blocks do have similar rents, but neighbours help only slightly, and only for blocks with no history, which are about 1\% of rows or fewer. Averaging a tree and a neural model gives a small gain of 0.3\%.
-
-What the graph adds is a test of whether connections matter, and attributions that reach neighbours' features. Applied to the models we report, those attributions explain the null result: neighbours share credit with a signal that the block already has, and a network without them reaches the same location effect. Explanations also showed directly that the submitted model freezes the market level. The checks support the neighbours' overall share and the feature rankings, but less so the ranking of individual neighbours or the size of their effects.
