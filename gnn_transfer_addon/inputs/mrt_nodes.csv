@@ -1,0 +1,123 @@
+NAME,LATITUDE,LONGITUDE,codes,lines,amenity_id,n_lines,is_interchange,line_ns,line_ew,line_ne,line_cc,line_dt,line_te
+admiralty mrt station,1.440689,103.800933,ns10,ns,0,1,0,1,0,0,0,0,0
+aljunied mrt station,1.316389,103.882778,ew9,ew,1,1,0,0,1,0,0,0,0
+ang mo kio mrt station,1.370017,103.84945,ns16,ns,2,1,0,1,0,0,0,0,0
+bartley mrt station,1.3425,103.88,cc12,cc,3,1,0,0,0,0,1,0,0
+bayfront mrt station,1.2825,103.859444,cc34;dt16,cc;dt,4,2,1,0,0,0,1,1,0
+beauty world mrt station,1.341111,103.775833,dt5,dt,5,1,0,0,0,0,0,1,0
+bedok mrt station,1.324039,103.930036,ew5,ew,6,1,0,0,1,0,0,0,0
+bedok north mrt station,1.336389,103.917778,dt29,dt,7,1,0,0,0,0,0,1,0
+bedok reservoir mrt station,1.336389,103.933056,dt30,dt,8,1,0,0,0,0,0,1,0
+bencoolen mrt station,1.298889,103.850278,dt21,dt,9,1,0,0,0,0,0,1,0
+bendemeer mrt station,1.313611,103.863056,dt23,dt,10,1,0,0,0,0,0,1,0
+bishan mrt station,1.351111,103.848333,cc15;ns17,cc;ns,11,2,1,1,0,0,1,0,0
+boon keng mrt station,1.319444,103.861667,ne9,ne,12,1,0,0,0,1,0,0,0
+boon lay mrt station,1.338611,103.705833,ew27,ew,13,1,0,0,1,0,0,0,0
+botanic gardens mrt station,1.3225,103.815278,cc19;dt9,cc;dt,14,2,1,0,0,0,1,1,0
+braddell mrt station,1.340339,103.846725,ns18,ns,15,1,0,1,0,0,0,0,0
+bras basah mrt station,1.296944,103.850556,cc2,cc,16,1,0,0,0,0,1,0,0
+buangkok mrt station,1.382778,103.893056,ne15,ne,17,1,0,0,0,1,0,0,0
+bugis mrt station,1.300278,103.856111,dt14;ew12,dt;ew,18,2,1,0,1,0,0,1,0
+bukit batok mrt station,1.349167,103.749722,ns2,ns,19,1,0,1,0,0,0,0,0
+bukit gombak mrt station,1.358611,103.751667,ns3,ns,20,1,0,1,0,0,0,0,0
+bukit panjang mrt/lrt station,1.378611,103.761667,dt1,dt,21,1,0,0,0,0,0,1,0
+buona vista mrt station,1.307333,103.790028,cc22;ew21,cc;ew,22,2,1,0,1,0,1,0,0
+caldecott mrt station,1.337778,103.839444,cc17,cc,23,1,0,0,0,0,1,0,0
+canberra mrt station,1.443056,103.829722,ns12,ns,24,1,0,1,0,0,0,0,0
+cashew mrt station,1.368889,103.764722,dt2,dt,25,1,0,0,0,0,0,1,0
+changi airport mrt station,1.3575,103.988333,cg2,ew,26,1,0,0,1,0,0,0,0
+chinatown mrt station,1.285,103.843889,dt19;ne4,dt;ne,27,2,1,0,0,1,0,1,0
+chinese garden mrt station,1.3425,103.7325,ew25,ew,28,1,0,0,1,0,0,0,0
+choa chu kang mrt/lrt station,1.385,103.744444,ns4,ns,29,1,0,1,0,0,0,0,0
+city hall mrt station,1.293333,103.852222,ew13;ns25,ew;ns,30,2,1,1,1,0,0,0,0
+clarke quay mrt station,1.288611,103.846667,ne5,ne,31,1,0,0,0,1,0,0,0
+clementi mrt station,1.315303,103.765244,ew23,ew,32,1,0,0,1,0,0,0,0
+commonwealth mrt station,1.3025,103.798056,ew20,ew,33,1,0,0,1,0,0,0,0
+dakota mrt station,1.308333,103.888611,cc8,cc,34,1,0,0,0,0,1,0,0
+dhoby ghaut mrt station,1.299444,103.84499999999998,cc1;ne6;ns24,cc;ne;ns,35,3,1,1,0,1,1,0,0
+dover mrt station,1.311314,103.778658,ew22,ew,36,1,0,0,1,0,0,0,0
+downtown mrt station,1.279444,103.853056,dt17,dt,37,1,0,0,0,0,0,1,0
+esplanade mrt station,1.293333,103.855556,cc3,cc,38,1,0,0,0,0,1,0,0
+eunos mrt station,1.319722,103.903056,ew7,ew,39,1,0,0,1,0,0,0,0
+expo mrt station,1.335278,103.961944,cg1;dt35,dt;ew,40,2,1,0,1,0,0,1,0
+farrer park mrt station,1.312222,103.854167,ne8,ne,41,1,0,0,0,1,0,0,0
+farrer road mrt station,1.317222,103.8075,cc20,cc,42,1,0,0,0,0,1,0,0
+fort canning mrt station,1.2925,103.844444,dt20,dt,43,1,0,0,0,0,0,1,0
+geylang bahru mrt station,1.321389,103.871389,dt24,dt,44,1,0,0,0,0,0,1,0
+gul circle mrt station,1.3212,103.6657,ew30,ew,45,1,0,0,1,0,0,0,0
+harbourfront mrt station,1.265278,103.822222,cc29;ne1,cc;ne,46,2,1,0,0,1,1,0,0
+haw par villa mrt station,1.282778,103.781667,cc25,cc,47,1,0,0,0,0,1,0,0
+hillview mrt station,1.3625,103.7675,dt3,dt,48,1,0,0,0,0,0,1,0
+holland village mrt station,1.311944,103.796111,cc21,cc,49,1,0,0,0,0,1,0,0
+hougang mrt station,1.371389,103.892222,ne14,ne,50,1,0,0,0,1,0,0,0
+jalan besar mrt station,1.305556,103.855278,dt22,dt,51,1,0,0,0,0,0,1,0
+joo koon mrt station,1.327739,103.678486,ew29,ew,52,1,0,0,1,0,0,0,0
+jurong east mrt station,1.333333,103.742222,ew24;ns1,ew;ns,53,2,1,1,1,0,0,0,0
+kaki bukit mrt station,1.335,103.908889,dt28,dt,54,1,0,0,0,0,0,1,0
+kallang mrt station,1.311469,103.8714,ew10,ew,55,1,0,0,1,0,0,0,0
+kembangan mrt station,1.321111,103.913333,ew6,ew,56,1,0,0,1,0,0,0,0
+kent ridge mrt station,1.293333,103.784444,cc24,cc,57,1,0,0,0,0,1,0,0
+khatib mrt station,1.417167,103.8329,ns14,ns,58,1,0,1,0,0,0,0,0
+king albert park mrt station,1.335833,103.783611,dt6,dt,59,1,0,0,0,0,0,1,0
+kovan mrt station,1.360278,103.885,ne13,ne,60,1,0,0,0,1,0,0,0
+kranji mrt station,1.425047,103.761853,ns7,ns,61,1,0,1,0,0,0,0,0
+labrador park mrt station,1.272222,103.802778,cc27,cc,62,1,0,0,0,0,1,0,0
+lakeside mrt station,1.344589,103.721139,ew26,ew,63,1,0,0,1,0,0,0,0
+lavender mrt station,1.307167,103.863008,ew11,ew,64,1,0,0,1,0,0,0,0
+little india mrt station,1.306667,103.849722,dt12;ne7,dt;ne,65,2,1,0,0,1,0,1,0
+lorong chuan mrt station,1.351667,103.863889,cc14,cc,66,1,0,0,0,0,1,0,0
+macpherson mrt station,1.326667,103.89,cc10;dt26,cc;dt,67,2,1,0,0,0,1,1,0
+marina bay mrt station,1.275278,103.854722,cc33;ns27,cc;ns,68,2,1,1,0,0,1,0,0
+marina south pier mrt station,1.270944,103.86325,ns28,ns,69,1,0,1,0,0,0,0,0
+marsiling mrt station,1.432636,103.774283,ns8,ns,70,1,0,1,0,0,0,0,0
+marymount mrt station,1.349167,103.839444,cc16,cc,71,1,0,0,0,0,1,0,0
+mattar mrt station,1.327222,103.882778,dt25,dt,72,1,0,0,0,0,0,1,0
+mountbatten mrt station,1.306389,103.8825,cc7,cc,73,1,0,0,0,0,1,0,0
+newton mrt station,1.313056,103.838333,dt11;ns21,dt;ns,74,2,1,1,0,0,0,1,0
+nicoll highway mrt station,1.299722,103.863611,cc5,cc,75,1,0,0,0,0,1,0,0
+novena mrt station,1.320394,103.843689,ns20,ns,76,1,0,1,0,0,0,0,0
+one-north mrt station,1.299444,103.786944,cc23,cc,77,1,0,0,0,0,1,0,0
+orchard mrt station,1.303056,103.831389,ns22,ns,78,1,0,1,0,0,0,0,0
+outram park mrt station,1.280556,103.84,ew16;ne3,ew;ne,79,2,1,0,1,1,0,0,0
+pasir panjang mrt station,1.276111,103.791389,cc26,cc,80,1,0,0,0,0,1,0,0
+pasir ris mrt station,1.372411,103.949369,ew1,ew,81,1,0,0,1,0,0,0,0
+paya lebar mrt station,1.317778,103.8925,cc9;ew8,cc;ew,82,2,1,0,1,0,1,0,0
+pioneer mrt station,1.337578,103.697217,ew28,ew,83,1,0,0,1,0,0,0,0
+potong pasir mrt station,1.331111,103.869167,ne10,ne,84,1,0,0,0,1,0,0,0
+promenade mrt station,1.2925,103.860833,cc4;dt15,cc;dt,85,2,1,0,0,0,1,1,0
+punggol mrt/lrt station,1.405278,103.9025,ne17,ne,86,1,0,0,0,1,0,0,0
+queenstown mrt station,1.294442,103.806114,ew19,ew,87,1,0,0,1,0,0,0,0
+raffles place mrt station,1.283889,103.851389,ew14;ns26,ew;ns,88,2,1,1,1,0,0,0,0
+redhill mrt station,1.289722,103.816667,ew18,ew,89,1,0,0,1,0,0,0,0
+rochor mrt station,1.303764,103.852581,dt13,dt,90,1,0,0,0,0,0,1,0
+sembawang mrt station,1.449025,103.820153,ns11,ns,91,1,0,1,0,0,0,0,0
+sengkang mrt/lrt station,1.391667,103.895556,ne16,ne,92,1,0,0,0,1,0,0,0
+serangoon mrt station,1.349167,103.873611,cc13;ne12,cc;ne,93,2,1,0,0,1,1,0,0
+simei mrt station,1.343444,103.953172,ew3,ew,94,1,0,0,1,0,0,0,0
+sixth avenue mrt station,1.330833,103.7975,dt7,dt,95,1,0,0,0,0,0,1,0
+somerset mrt station,1.300514,103.839028,ns23,ns,96,1,0,1,0,0,0,0,0
+stadium mrt station,1.302778,103.875278,cc6,cc,97,1,0,0,0,0,1,0,0
+stevens mrt station,1.32,103.826111,dt10,dt,98,1,0,0,0,0,0,1,0
+tai seng mrt station,1.335833,103.887778,cc11,cc,99,1,0,0,0,0,1,0,0
+tampines east mrt station,1.356389,103.954722,dt33,dt,100,1,0,0,0,0,0,1,0
+tampines mrt station,1.355,103.943889,dt32;ew2,dt;ew,101,2,1,0,1,0,0,1,0
+tampines west mrt station,1.345556,103.938333,dt31,dt,102,1,0,0,0,0,0,1,0
+tan kah kee mrt station,1.326111,103.807222,dt8,dt,103,1,0,0,0,0,0,1,0
+tanah merah mrt station,1.327358,103.946344,ew4,ew,104,1,0,0,1,0,0,0,0
+tanjong pagar mrt station,1.276439,103.845711,ew15,ew,105,1,0,0,1,0,0,0,0
+telok ayer mrt station,1.282222,103.848333,dt18,dt,106,1,0,0,0,0,0,1,0
+telok blangah mrt station,1.270556,103.809722,cc28,cc,107,1,0,0,0,0,1,0,0
+tiong bahru mrt station,1.286081,103.826958,ew17,ew,108,1,0,0,1,0,0,0,0
+toa payoh mrt station,1.332778,103.8475,ns19,ns,109,1,0,1,0,0,0,0,0
+tuas crescent mrt station,1.321139,103.649,ew31,ew,110,1,0,0,1,0,0,0,0
+tuas link mrt station,1.340278,103.636806,ew33,ew,111,1,0,0,1,0,0,0,0
+tuas west road mrt station,1.330056,103.639611,ew32,ew,112,1,0,0,1,0,0,0,0
+ubi mrt station,1.33,103.9,dt27,dt,113,1,0,0,0,0,0,1,0
+upper changi mrt station,1.341944,103.961389,dt34,dt,114,1,0,0,0,0,0,1,0
+woodlands mrt station,1.437094,103.786483,ns9;te2,ns;te,115,2,1,1,0,0,0,0,1
+woodlands north mrt station,1.448333,103.785,te1,te,116,1,0,0,0,0,0,0,1
+woodlands south mrt station,1.427222,103.793889,te3,te,117,1,0,0,0,0,0,0,1
+woodleigh mrt station,1.339167,103.870833,ne11,ne,118,1,0,0,0,1,0,0,0
+yew tee mrt station,1.3975,103.7475,ns5,ns,119,1,0,1,0,0,0,0,0
+yio chu kang mrt station,1.381906,103.844817,ns15,ns,120,1,0,1,0,0,0,0,0
+yishun mrt station,1.429464,103.835239,ns13,ns,121,1,0,1,0,0,0,0,0

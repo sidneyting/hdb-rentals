@@ -1,0 +1,102 @@
+{
+  "status": "passed",
+  "tolerance": "preprocessing/initialization/outputs exact; gradients rtol=1e-5, atol=1e-9",
+  "checks": [
+    {
+      "experiment": "hierarchy",
+      "model": "MLP_geo",
+      "seed": 0,
+      "parameters": 25729
+    },
+    {
+      "experiment": "hierarchy",
+      "model": "MLP_geo",
+      "seed": 1,
+      "parameters": 25729
+    },
+    {
+      "experiment": "hierarchy",
+      "model": "Hierarchy_static",
+      "seed": 0,
+      "parameters": 25729
+    },
+    {
+      "experiment": "hierarchy",
+      "model": "Hierarchy_static",
+      "seed": 1,
+      "parameters": 25729
+    },
+    {
+      "experiment": "mrt",
+      "model": "MLP_station",
+      "seed": 0,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "MLP_station",
+      "seed": 1,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Catchment_only",
+      "seed": 0,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Catchment_only",
+      "seed": 1,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Rail_1",
+      "seed": 0,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Rail_1",
+      "seed": 1,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Rail_3",
+      "seed": 0,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Rail_3",
+      "seed": 1,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Shuffled_3",
+      "seed": 0,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Shuffled_3",
+      "seed": 1,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Geographic_3",
+      "seed": 0,
+      "parameters": 27809
+    },
+    {
+      "experiment": "mrt",
+      "model": "Geographic_3",
+      "seed": 1,
+      "parameters": 27809
+    }
+  ]
+}

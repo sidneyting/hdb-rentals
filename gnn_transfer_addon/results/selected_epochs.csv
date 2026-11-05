@@ -1,0 +1,17 @@
+experiment,model,seed,epochs,parameters
+hierarchy,MLP_geo,0,286,25761
+hierarchy,MLP_geo,1,302,25761
+hierarchy,Hierarchy_static,0,375,25761
+hierarchy,Hierarchy_static,1,396,25761
+mrt,MLP_station,0,441,27585
+mrt,MLP_station,1,314,27585
+mrt,Catchment_only,0,442,27585
+mrt,Catchment_only,1,407,27585
+mrt,Rail_1,0,442,27585
+mrt,Rail_1,1,396,27585
+mrt,Rail_3,0,504,27585
+mrt,Rail_3,1,351,27585
+mrt,Shuffled_3,0,442,27585
+mrt,Shuffled_3,1,350,27585
+mrt,Geographic_3,0,541,27585
+mrt,Geographic_3,1,453,27585

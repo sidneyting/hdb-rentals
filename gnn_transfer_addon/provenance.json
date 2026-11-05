@@ -1,0 +1,60 @@
+{
+  "created_on": "2026-11-05",
+  "scope": "Whole-subzone hierarchy and whole-station-catchment report addition",
+  "runtime_inputs_sha256": {
+    "data/train.csv": "6d7a417de72112361f8353659ba6fe44a442b07465b488aff1b03f7ec1ea3ba6",
+    "src/hdb_rentals/rent_adjustment.py": "6dac959fe2d59f1e8ad2c6ce4d3b731c9c2e77b7f60379c736f95e62749fa1d8",
+    "src/hdb_rentals/market_level.py": "888408261a5256902647ff55a8d7bb0d16dc20022cacb5124faf063a14e3064c",
+    "src/hdb_rentals/config.py": "eb1b9a476573a61768db37fb408ad31092cf544d9e8c5a1e505d5f1e3a1615d2"
+  },
+  "exploratory_sources_sha256": {
+    "scripts/experiment_hierarchical_gnns.py": "0e89bff582c08b974f13b0b181fee983e1862f073a01ee75746edcb3f1577f3a",
+    "scripts/experiment_unseen_subzone_hierarchy.py": "0d6bc3531590c377e8b07782307be8907b10d23bb461494bf038ed331fe9891a",
+    "scripts/experiment_weighted_gnns.py": "a9045f75948410fdd5ad99f6c6c89949684940097868d5c9fb40f9cb623d7104",
+    "scripts/investigate_graph_signal.py": "02cc4ae250ce3cb5776c84d4385f247d1c2658f4da1905e2faec025ea87d04fb",
+    "scripts/investigate_mrt_catchments.py": "7303b718eb2c36ece6263b908c195dbebbde34beb8c34523c673fbd7b07823eb",
+    "scripts/finalize_mrt_catchments.py": "9f99bb605077b943fa2201651cbf46a87562e8971491740ab8b19356735b1568",
+    "outputs/08_graph_amenities/block_nodes.csv": "99333223ccec54e24e0be10c08be9537b46a90c23c326da28a5a35b500c25807",
+    "outputs/08_graph_amenities/mrt_nodes.csv": "fc1fca75f5b2c3ae4120bb48a753e475d819ba2c5a63118180d59902c00fee6e",
+    "outputs/08_graph_amenities/mrt_rail_edges.csv": "5cd23351f198581fa1eedfc3b989b362fceabfce10f628f6e4d520387f9c0fe5",
+    "outputs/09_graph_block_evaluation/config.json": "6dfe8095ee2607086626d36b7f330360c7ee07af4f8a45fca8705ffc99593401",
+    "outputs/13_hierarchical_gnns/unseen_subzone_ensemble_metrics.csv": "54b36d2605dbde15312ffde43984c2d4eef4e62bc2810f1262d86eb7f53dcd20",
+    "outputs/13_hierarchical_gnns/unseen_subzone_cluster_bootstrap.csv": "6961bdfcd256a71f894c6eb59c2f1f6e7410c4bb940e53f56096b84e00837385",
+    "outputs/14_mrt_catchments/ensemble_metrics.csv": "3ffcbb19e3803c7cc67abdfdd784fb730dd1d25ee73f0f6fbe1f0a85551d8e83",
+    "outputs/14_mrt_catchments/conditional_station_bootstrap.csv": "51c7b9ed33128598de2a77338d8e1d234c154c8ae124600b2f0e3535d44e9c08"
+  },
+  "packaging_environment": {
+    "python": "3.12.16",
+    "torch": "2.14.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0",
+    "sklearn": "1.9.1"
+  },
+  "bundled_files_sha256": {
+    ".gitignore": "e5cefd046795d6750f9d32a85ef5e0313f17383ed182f771dcd892c15c66e3b6",
+    "inputs/block_nodes.csv.gz": "b0189a2f82e6f329d65618ebec2a1617d122fe0d2e1ac6bb5be5572fe6f85be2",
+    "inputs/feature_spec.json": "6f1139b1d4632379d5db83cff07103ac7af3077ff8ae6d891176e770b4db11b1",
+    "inputs/mrt_nodes.csv": "fc1fca75f5b2c3ae4120bb48a753e475d819ba2c5a63118180d59902c00fee6e",
+    "inputs/mrt_rail_edges.csv": "5cd23351f198581fa1eedfc3b989b362fceabfce10f628f6e4d520387f9c0fe5",
+    "models.py": "629c87c90c01b3896326eb4fb870ac6278ae8763ab1551fef009411ed36c96c6",
+    "README.md": "194df6a354680aefd6abc0e1803e4d0e2871ab78455a97337e10dd43333fc07e",
+    "results/bootstrap.csv": "de6f83196f3fb78a7ac5de3c592a1e92ffd59c264f58fc9803947ddb92e16091",
+    "results/cluster_errors.csv": "b4e99bd9dc21c22cd1a9208dc55dbcb5fb9737ff2bc31066f78a0ac284d8d32b",
+    "results/context_metrics.csv": "3d648f2359e111da4b364b4fbc3f7a709f5af72ffe2f8d90fefd003edfccf2fb",
+    "results/ensemble_metrics.csv": "3b0be9436bb0e6e6cbafdfe4e14f9107bf484f7a2ef44f52eeb3b1dc320675d5",
+    "results/extraction_checks.json": "7c5774ff66097df84c7b6f10f0b0ce504e525444704bfd4e8fef16880482bc26",
+    "results/held_groups.csv": "dd7da4fe06df0b1ddda881245a73cf11239537fd1fafc8d9109259f96eea695a",
+    "results/protocols.json": "0c2d25a347be4603886c0cb7ea8960b0dad11658d72583db419cecd10c04f4c7",
+    "results/seed_metrics.csv": "3355b846af931a4102c82327cf2070c96e9433a39d844c7dc1aa081ad54b8e1c",
+    "results/selected_epochs.csv": "5707861b368e3eef1d36176b04188ce305dbf2c031f1f52649f33e4706dbd2e0",
+    "results/smoke_checks.json": "e0cc7d65e01009e5ec850b10e475ed0e54759a50f04c1eb575557b84b8b597a6",
+    "results/table.csv": "13e9a2d35c45b8a02e16b933880ff11ef6130d7888e935e6bdca1c6e6b1ac86f",
+    "run.py": "585674b149d3c91cc670e131c30e03ec51cb3adc872172f5b9a9f1fb9a62f0a9"
+  },
+  "notes": [
+    "Frozen metrics are from the original exploratory runs, not the smoke checks.",
+    "The copied folder runs without the exploratory workspace.",
+    "Full retuning was not repeated during packaging; extraction parity and all model smoke branches were checked.",
+    "2026-11-05: integrated into the repo; paste-in notebook cells and the report snippet removed, README rewritten, bundled hashes refreshed. Code, inputs and results unchanged."
+  ]
+}
