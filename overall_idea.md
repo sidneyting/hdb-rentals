@@ -21,7 +21,7 @@ Blocks are nodes, nearby blocks are joined by edges (Part 2.4). The GNN matches 
 
 - for blocks with no past rentals of that flat type, neighbours' premiums matter about as much as the block's own fallback premium (Part 3.3: $63 vs $68). The MLP with the same premium channel shows this too, so it comes from the premium input, not from message passing;
 - once a block has history, its own premium dominates;
-- on the Part 3 explanation of the scored model, neighbours share credit with a signal the block already has ($222 own block + neighbours vs $217 for the MLP's own block).
+- on the Part 3 explanation of the scored model, neighbours share credit with a signal the block already has ($219 own block + neighbours vs $215 for the MLP's own block, on `hold`).
 
 That cold-start case is rare: 1.44% of holdout rows and 0.77% of test rows have no fit rentals of the same block + flat type (Part 2.4, cold-start findings). So it shows structure but cannot move RMSE. On blocks with their rentals hidden (Part 2.4, unseen blocks), neighbours' premiums gain about 0.2% (clear for the MLP only), and message passing adds nothing. The neural models do beat LightGBM there by about 19, with or without a graph.
 
@@ -39,7 +39,7 @@ Wording to use: "averaging a tree and a neural model gives a small gain". Wordin
 
 ### 4. Interpretability
 
-The report explains the scored model itself (`scripts/explain_table2_gnn.py`, `outputs/13_interpretability_table2/`). Parts 3.2 and 3.3 explain siblings; use them for the planted-effect check of the method and the neighbour-premium side test.
+The report compares and explains the neural models on the `hold` level, the closest to the submitted month-index model (`gnn_premiums_blend.py --level hold --same-level`, `gnn_graph_tests.py --level hold`, `explain_table2_gnn.py --level hold`, results under `level-hold`). The `blend` runs remain as a robustness check. On `hold`: E1 482.6, GNN 483.6, MLP 483.5, shuffled 483.5, blends 481.6 and 481.5; no neighbour rule clears, so "neighbours' premiums help unseen blocks" holds on `blend` only. Parts 3.2 and 3.3 explain siblings; use them for the planted-effect check of the method and the neighbour-premium side test.
 
 At equal accuracy (with premiums, Part 2.4; without them the GNN is about 5 behind its LightGBM reference, Part 3.2), the GNN is the model whose explanations can reach neighbouring blocks: how much credit neighbours share. The MLP explains features and location equally well; only the GNN can split credit among neighbouring blocks' features (never their rents in the scored model; ranking of single neighbours is weak, $8.2 vs $5.9 for a random one). Same method for both (Integrated Gradients); the GNN's explanations are **richer**, not easier to get.
 

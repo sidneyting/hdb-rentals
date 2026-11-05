@@ -1,0 +1,7 @@
+model,premiums,tuning,holdout,weight,holdout vs E0,holdout vs E1
+part23_E0_LightGBM,none,600.61,484.23,,0.0,1.63
+part23_E1_LightGBM,row,601.47,482.6,,-1.63,0.0
+MLP_matched,row,601.95,483.69,,-0.55,1.09
+MLP_matched + E1 blend,row,600.44,481.56,0.45,-2.67,-1.03
+GNN_uniform,row,602.34,484.13,,-0.1,1.53
+GNN_uniform + E1 blend,row,600.6,481.69,0.4,-2.54,-0.91

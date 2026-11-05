@@ -1,0 +1,8 @@
+,0
+top neighbour moved,8.796
+random neighbour moved,6.206
+rows,400.0
+neighbour rank GNN seed 0 vs GNN seed 1,0.694
+neighbour rank GNN seed 0 vs GNN seed 2,0.69
+neighbour rank GNN seed 1 vs GNN seed 2,0.681
+neighbour rank GNN seed 0 vs GNN untrained,0.011

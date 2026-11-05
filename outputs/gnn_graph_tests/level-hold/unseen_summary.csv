@@ -1,0 +1,15 @@
+slice,model,premiums,graph,rmse,sd,bias,n_rows,epochs
+unseen blocks,E1 LightGBM,row,none,513.0,5.25,87.33,8846.0,
+seen blocks,E1 LightGBM,row,none,483.66,0.83,-14.55,35317.0,
+unseen blocks,MLP_matched,row,real,498.12,2.79,27.49,8846.0,238.67
+seen blocks,MLP_matched,row,real,484.43,0.47,-28.75,35317.0,238.67
+unseen blocks,GNN_uniform,row,real,497.75,2.92,26.13,8846.0,227.67
+seen blocks,GNN_uniform,row,real,484.63,0.45,-27.48,35317.0,227.67
+unseen blocks,GNN_uniform,row,shuffled,498.36,2.82,28.92,8846.0,238.67
+seen blocks,GNN_uniform,row,shuffled,484.56,0.67,-28.74,35317.0,238.67
+unseen blocks,MLP_matched,row+nbr,real,497.24,2.89,27.1,8846.0,218.33
+seen blocks,MLP_matched,row+nbr,real,484.54,0.58,-26.28,35317.0,218.33
+unseen blocks,GNN_uniform,row+nbr,real,497.52,2.63,25.43,8846.0,235.33
+seen blocks,GNN_uniform,row+nbr,real,484.5,0.41,-25.79,35317.0,235.33
+unseen blocks,MLP_matched,row+nbr,shuffled,497.97,3.2,29.49,8846.0,229.67
+seen blocks,MLP_matched,row+nbr,shuffled,484.36,0.43,-26.25,35317.0,229.67

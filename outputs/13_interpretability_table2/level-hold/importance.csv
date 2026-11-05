@@ -1,0 +1,9 @@
+,GNN (IG),MLP (IG),LightGBM (TreeSHAP)
+Floor area,141.1,136.8,83.9
+Flat type,129.2,123.2,185.1
+Flat model,32.7,33.2,14.9
+Flat age,46.8,38.8,41.9
+Block premiums,89.1,89.5,103.1
+Town and area,38.2,61.4,53.7
+Location and building,71.9,104.3,77.2
+Neighbouring blocks,53.0,0.0,

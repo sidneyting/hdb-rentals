@@ -1,0 +1,6 @@
+pair,mean per-rental spearman
+GNN seed 0 vs GNN seed 1,0.873
+GNN seed 0 vs GNN seed 2,0.881
+GNN seed 1 vs GNN seed 2,0.889
+GNN seed 0 vs GNN untrained,0.304
+GNN seed 0 vs MLP,0.748
